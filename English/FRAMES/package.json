@@ -1,0 +1,11 @@
+{
+  "scripts": {
+    "dev": "servor --reload",
+    "start": "servor --reload"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.7",
+    "servor": "^4.0.2",
+    "xlsx": "^0.18.5"
+  }
+}
