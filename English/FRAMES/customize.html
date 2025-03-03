@@ -39,10 +39,6 @@
           <i class="fas fa-user"></i>
           Profile
         </a>
-        <a href="#help">
-          <i class="fas fa-question-circle"></i>
-          Help
-        </a>
         <button id="logout">
           <i class="fas fa-sign-out-alt"></i>
           Logout
@@ -60,8 +56,7 @@
           <div class="frame-display">
             <div class="frame-content">
               <div class="verse-display">
-                <p id="selectedVerse" class="verse-text"></p>
-                <p id="verseReference" class="verse-reference"></p>
+                <p id="customText" class="verse-text"></p>
               </div>
             </div>
           </div>
@@ -71,31 +66,10 @@
         </div>
 
         <div class="verse-selection">
-          <div class="language-selector">
-            <button class="lang-btn active" data-lang="english">English</button>
-            <button class="lang-btn" data-lang="telugu">తెలుగు</button>
-          </div>
-
-          <div class="bible-selector">
-            <div class="select-group">
-              <label for="book">Book</label>
-              <select id="book" required>
-                <option value="">Select Book</option>
-              </select>
-            </div>
-
-            <div class="select-group">
-              <label for="chapter">Chapter</label>
-              <select id="chapter" required disabled>
-                <option value="">Select Chapter</option>
-              </select>
-            </div>
-
-            <div class="select-group">
-              <label for="verse">Verse</label>
-              <select id="verse" required disabled>
-                <option value="">Select Verse</option>
-              </select>
+          <div class="text-input-container">
+            <div class="form-group">
+              <label for="frameText">Enter Your Text</label>
+              <textarea id="frameText" rows="5" placeholder="Enter the text you want on your frame..." required></textarea>
             </div>
           </div>
 

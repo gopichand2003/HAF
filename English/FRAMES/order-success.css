@@ -124,6 +124,15 @@
   margin: 0;
 }
 
+.item-details .custom-text {
+  color: var(--primary-color);
+  font-style: italic;
+  margin: 0.5rem 0;
+  padding: 0.5rem;
+  background: rgba(44, 74, 124, 0.1);
+  border-radius: 4px;
+}
+
 .item-price {
   color: var(--primary-color);
   font-weight: 600;

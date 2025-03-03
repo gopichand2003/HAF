@@ -1,12 +1,13 @@
 import { db, auth } from './firebase-config.js';
-import { collection, getDocs, query, orderBy, doc, getDoc, updateDoc, onSnapshot, arrayUnion, Timestamp, deleteDoc, addDoc, runTransaction } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-firestore.js";
+import { doc, getDoc, updateDoc, collection, query, orderBy, onSnapshot, getDocs, addDoc, Timestamp, deleteDoc } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-firestore.js";
+import { signOut } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-auth.js";
 
 let allOrders = [];
-let selectedUserId = null;
-let chatUnsubscribe = null;
 let editingItemId = null;
+let editingFrameTypeId = null;
 let currentFilter = 'all';
-let totalUnreadMessages = 0;
+let frameTypes = [];
+let unreadMessageCount = 0; // New variable to track total unread messages
 
 document.addEventListener('DOMContentLoaded', () => {
     // Check authentication first
@@ -17,10 +18,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     loadOrders();
     loadItems();
+    loadFrameTypes();
     setupEventListeners();
     setupNavigation();
-    loadUsers();
-    updateUnreadMessageCount();
+    setupAdminUnreadMessagesListener(); // Add this line
 });
 
 function setupNavigation() {
@@ -51,7 +52,6 @@ function setupEventListeners() {
     
     // Filters
     document.getElementById('searchOrders')?.addEventListener('input', filterOrders);
-    document.getElementById('searchRequests')?.addEventListener('input', filterUsers);
     document.getElementById('searchItems')?.addEventListener('input', filterItems);
 
     // Order Status Filter Buttons
@@ -66,21 +66,21 @@ function setupEventListeners() {
     });
 
     // Navigation
-    const navButtons = document.querySelectorAll('.nav-btn');
+    const navButtons = document.querySelectorAll('.nav-btn[data-section]');
     navButtons.forEach(btn => {
-        btn.addEventListener('click', () => {
-            navButtons.forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            
-            const section = btn.dataset.section;
-            document.getElementById('ordersSection').style.display = section === 'orders' ? 'block' : 'none';
-            document.getElementById('requestsSection').style.display = section === 'requests' ? 'block' : 'none';
-            document.getElementById('itemsSection').style.display = section === 'items' ? 'block' : 'none';
-            
-            if (section === 'requests') {
-                loadUsers();
-            } else if (section === 'items') {
-                loadItems();
+        btn.addEventListener('click', (e) => {
+            if (btn.dataset.section) {
+                e.preventDefault();
+                navButtons.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                
+                const section = btn.dataset.section;
+                document.getElementById('ordersSection').style.display = section === 'orders' ? 'block' : 'none';
+                document.getElementById('itemsSection').style.display = section === 'items' ? 'block' : 'none';
+                
+                if (section === 'items') {
+                    loadItems();
+                }
             }
         });
     });
@@ -88,17 +88,42 @@ function setupEventListeners() {
     // Item Form
     const itemForm = document.getElementById('itemForm');
     if (itemForm) {
-        itemForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            await handleItemSubmit(e);
-        });
+        itemForm.addEventListener('submit', handleItemSubmit);
     }
 
-    // Admin Chat Form
-    const adminChatForm = document.getElementById('adminChatForm');
-    if (adminChatForm) {
-        adminChatForm.addEventListener('submit', handleAdminReply);
+    // Frame Type Form
+    const frameTypeForm = document.getElementById('frameTypeForm');
+    if (frameTypeForm) {
+        frameTypeForm.addEventListener('submit', handleFrameTypeSubmit);
     }
+}
+
+// New function to listen for unread messages
+function setupAdminUnreadMessagesListener() {
+    const chatMetadataRef = collection(db, "chatMetadata");
+    onSnapshot(chatMetadataRef, (snapshot) => {
+        unreadMessageCount = 0;
+        snapshot.forEach(doc => {
+            const data = doc.data();
+            // Only count messages from users to admin that are unread
+            if (data.unreadCount && data.lastMessage && data.lastMessage.sender === 'user') {
+                unreadMessageCount += data.unreadCount;
+            }
+        });
+
+        const unreadBadge = document.getElementById('adminUnreadCount');
+        const floatingSupportBtn = document.querySelector('.floating-support-btn');
+        
+        if (unreadBadge && floatingSupportBtn) {
+            unreadBadge.textContent = unreadMessageCount;
+            floatingSupportBtn.style.display = unreadMessageCount > 0 ? 'flex' : 'flex'; // Always show the button
+            console.log("Admin unread count:", unreadMessageCount); // Debug
+        } else {
+            console.error("Floating support button elements not found");
+        }
+    }, (error) => {
+        console.error("Error listening to unread messages:", error);
+    });
 }
 
 async function handleLogout() {
@@ -400,8 +425,8 @@ window.viewOrderDetails = function(orderNumber) {
                     <img src="${item.image}" alt="${item.name}">
                     <div class="item-details">
                         <h4>${item.name}</h4>
+                        ${item.customText ? `<p class="custom-text">Custom Text: "${item.customText}"</p>` : ''}
                         <p>Quantity: ${item.quantity}</p>
-                        <p>Price: ₹${item.price.toLocaleString()}</p>
                     </div>
                     <div class="item-total">
                         ₹${(item.price * item.quantity).toLocaleString()}
@@ -433,213 +458,215 @@ window.closeOrderModal = function() {
     document.getElementById('orderModal').classList.remove('active');
 };
 
-async function loadUsers() {
-    try {
-        const usersRef = collection(db, "users");
-        const usersSnapshot = await getDocs(usersRef);
-        const usersList = document.getElementById('usersList');
-        let usersWithChat = [];
-        totalUnreadMessages = 0;
+// Message handling function
+function showMessage(message, isError = false) {
+    // Remove any existing message
+    removeMessages();
+    
+    const messageDiv = document.createElement('div');
+    messageDiv.className = isError ? 'error-message' : 'success -message';
+    messageDiv.innerHTML = `
+        <i class="fas ${isError ? 'fa-exclamation-circle' : 'fa-check-circle'}"></i>
+        ${message}
+    `;
+    
+    // Find the appropriate container based on context
+    let container;
+    if (document.querySelector('.modal.active')) {
+        container = document.querySelector('.modal.active .modal-content');
+    } else if (document.getElementById('itemsSection').style.display !== 'none') {
+        container = document.querySelector('.section-header');
+    } else {
+        container = document.querySelector('.admin-container');
+    }
 
-        usersSnapshot.forEach(userDoc => {
-            const userData = userDoc.data();
-            if (userData.chat && userData.chat.length > 0) {
-                const unreadCount = userData.chat.filter(msg => 
-                    msg.sender === 'user' && !msg.readByAdmin
-                ).length;
-                
-                totalUnreadMessages += unreadCount;
-                
-                usersWithChat.push({
-                    id: userDoc.id,
-                    name: `${userData.firstName} ${userData.lastName}`,
-                    email: userData.email,
-                    lastMessage: userData.chat[userData.chat.length - 1],
-                    unreadCount
-                });
-            }
-        });
-
-        // Sort by latest message and unread count
-        usersWithChat.sort((a, b) => {
-            if (a.unreadCount !== b.unreadCount) {
-                return b.unreadCount - a.unreadCount;
-            }
-            return b.lastMessage.timestamp.seconds - a.lastMessage.timestamp.seconds;
-        });
-
-        // Update users list
-        if (usersList) {
-            usersList.innerHTML = usersWithChat.map(user => `
-                <div class="user-item ${user.unreadCount > 0 ? 'unread' : ''} ${user.id === selectedUserId ? 'active' : ''}"
-                     onclick="selectUser('${user.id}')">
-                    <div class="user-info">
-                        <h4>
-                            ${user.name}
-                            ${user.unreadCount > 0 ? `<span class="unread-badge">${user.unreadCount}</span>` : ''}
-                        </h4>
-                        <p>${user.email}</p>
-                        <div class="last-message">
-                            <p>${user.lastMessage.text.substring(0, 50)}${user.lastMessage.text.length > 50 ? '...' : ''}</p>
-                            <span>${new Date(user.lastMessage.timestamp.seconds * 1000).toLocaleString('en-IN', {
-                                hour: '2-digit',
-                                minute: '2-digit',
-                                hour12: true
-                            })}</span>
-                        </div>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        updateUnreadMessageCount();
-    } catch (error) {
-        console.error("Error loading users:", error);
+    if (container) {
+        container.insertAdjacentElement('afterbegin', messageDiv);
+        
+        // Auto-remove message after 5 seconds
+        setTimeout(() => {
+            messageDiv.remove();
+        }, 5000);
     }
 }
 
-window.selectUser = async function(userId) {
-    selectedUserId = userId;
-    
-    // Update UI to show active user
-    document.querySelectorAll('.user-item').forEach(item => {
-        item.classList.remove('active');
-        if (item.getAttribute('onclick').includes(userId)) {
-            item.classList.add('active');
-        }
-    });
+function removeMessages() {
+    const messages = document.querySelectorAll('.error-message, .success-message');
+    messages.forEach(msg => msg.remove());
+}
 
+async function loadFrameTypes() {
     try {
-        const userRef = doc(db, "users", userId);
-        const userDoc = await getDoc(userRef);
-        
-        if (userDoc.exists()) {
-            const userData = userDoc.data();
-            const chatHeader = document.getElementById('chatHeader');
-            const chatMessages = document.getElementById('chatMessages');
-            const messageInput = document.getElementById('adminMessageInput');
-            const sendButton = document.querySelector('#adminChatForm button');
-            
-            // Update chat header
-            chatHeader.innerHTML = `
-                <h4>${userData.firstName} ${userData.lastName}</h4>
-                <p>${userData.email}</p>
+        const frameTypesRef = collection(db, "frameTypes");
+        const snapshot = await getDocs(frameTypesRef);
+        frameTypes = [];
+        snapshot.forEach(doc => {
+            frameTypes.push({ id: doc.id, ...doc.data() });
+        });
+
+        // Update frame type select options
+        const materialSelect = document.getElementById('itemMaterial');
+        if (materialSelect) {
+            materialSelect.innerHTML = `
+                <option value="">Select Frame Type</option>
+                ${frameTypes.map(type => `
+                    <option value="${type.id}">${type.name}</option>
+                `).join('')}
             `;
-
-            // Enable message input
-            messageInput.disabled = false;
-            sendButton.disabled = false;
-
-            // Mark messages as read
-            const updatedChat = userData.chat.map(msg => ({
-                ...msg,
-                readByAdmin: msg.sender === 'user' ? true : msg.readByAdmin
-            }));
-            
-            await updateDoc(userRef, { chat: updatedChat });
-
-            // Subscribe to chat updates
-            if (chatUnsubscribe) {
-                chatUnsubscribe();
-            }
-
-            chatUnsubscribe = onSnapshot(userRef, (doc) => {
-                if (doc.exists()) {
-                    const updatedUserData = doc.data();
-                    renderMessages(updatedUserData.chat || []);
-                }
-            });
-
-            // Initial render
-            renderMessages(userData.chat || []);
         }
     } catch (error) {
-        console.error("Error selecting user:", error);
+        console.error("Error loading frame types:", error);
+        showMessage("Failed to load frame types. Please refresh the page.", true);
     }
+}
+
+// Frame type modal functions
+window.showFrameTypeModal = function() {
+    editingFrameTypeId = null;
+    document.getElementById('frameTypeModalTitle').textContent = 'Add New Frame Type';
+    document.getElementById('frameTypeForm').reset();
+    document.getElementById('frameTypeModal').classList.add('active');
 };
 
-function renderMessages(messages) {
-    const chatMessages = document.getElementById('chatMessages');
-    if (!chatMessages) return;
+window.closeFrameTypeModal = function() {
+    document.getElementById('frameTypeModal').classList.remove('active');
+    document.getElementById('frameTypeForm').reset();
+    editingFrameTypeId = null;
+};
 
-    chatMessages.innerHTML = messages.map(msg => `
-        <div class="chat-message ${msg.sender}">
-            <div class="message-content">${msg.text}</div>
-            <div class="message-time">
-                ${new Date(msg.timestamp.seconds * 1000).toLocaleString('en-IN', {
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    hour12: true,
-                    day: 'numeric',
-                    month: 'short'
-                })}
-            </div>
+window.addImageUrlInput = function() {
+    const imageUrlInputs = document.getElementById('imageUrlInputs');
+    const newInput = document.createElement('div');
+    newInput.className = 'image-url-group';
+    newInput.innerHTML = `
+        <div class="form-group">
+            <input type="text" class="frameImageUrl" placeholder="Enter image URL" required>
         </div>
-    `).join('');
+        <a href="https://imgbb.com/" target="_blank" class="convert-image-btn">
+            <i class="fas fa-image"></i>
+            Convert Image
+        </a>
+        <button type="button" class="remove-image-btn" onclick="this.parentElement.remove()">
+            <i class="fas fa-times"></i>
+        </button>
+    `;
+    imageUrlInputs.appendChild(newInput);
+};
 
-    // Scroll to bottom
-    chatMessages.scrollTop = chatMessages.scrollHeight;
-}
-
-async function handleAdminReply(e) {
+async function handleFrameTypeSubmit(e) {
     e.preventDefault();
     
-    if (!selectedUserId) return;
-
-    const messageInput = document.getElementById('adminMessageInput');
-    const message = messageInput.value.trim();
-    if (!message) return;
-
-    try {
-        const userRef = doc(db, "users", selectedUserId);
-        await updateDoc(userRef, {
-            chat: arrayUnion({
-                text: message,
-                sender: 'admin',
-                timestamp: Timestamp.now(),
-                readByUser: false
-            })
-        });
-
-        messageInput.value = '';
-    } catch (error) {
-        console.error("Error sending message:", error);
-    }
-}
-
-function updateUnreadMessageCount() {
-    const requestsBtn = document.querySelector('.nav-btn[data-section="requests"]');
-    if (requestsBtn) {
-        const countSpan = requestsBtn.querySelector('.request-count') || document.createElement('span');
-        countSpan.className = 'request-count';
-        
-        if (totalUnreadMessages > 0) {
-            countSpan.textContent = totalUnreadMessages;
-            countSpan.style.display = 'block';
-            if (!requestsBtn.contains(countSpan)) {
-                requestsBtn.appendChild(countSpan);
-            }
-        } else {
-            countSpan.style.display = 'none';
-        }
-    }
-}
-
-function filterUsers() {
-    const searchQuery = document.getElementById('searchRequests').value.toLowerCase();
-    const userItems = document.querySelectorAll('.user-item');
+    const submitButton = e.target.querySelector('button[type="submit"]');
+    submitButton.disabled = true;
     
-    userItems.forEach(item => {
-        const name = item.querySelector('h4').textContent.toLowerCase();
-        const email = item.querySelector('p').textContent.toLowerCase();
-        const visible = name.includes(searchQuery) || email.includes(searchQuery);
-        item.style.display = visible ? 'block' : 'none';
-    });
+    try {
+        const name = document.getElementById('frameTypeName').value;
+        const description = document.getElementById('frameDescription').value;
+        const imageUrls = Array.from(document.getElementsByClassName('frameImageUrl'))
+            .map(input => input.value)
+            .filter(url => url.trim() !== '');
+
+        if (imageUrls.length === 0) {
+            throw new Error('Please add at least one image URL');
+        }
+
+        const frameTypeData = {
+            name,
+            description,
+            images: imageUrls,
+            timestamp: Timestamp.now()
+        };
+
+        if (editingFrameTypeId) {
+            await updateDoc(doc(db, 'frameTypes', editingFrameTypeId), frameTypeData);
+        } else {
+            await addDoc(collection(db, 'frameTypes'), frameTypeData);
+        }
+        
+        closeFrameTypeModal();
+        loadFrameTypes();
+        showMessage(editingFrameTypeId ? 'Frame type updated successfully!' : 'Frame type added successfully!', false);
+    } catch (error) {
+        console.error("Error saving frame type:", error);
+        showMessage(error.message || 'Error saving frame type. Please try again.', true);
+    } finally {
+        submitButton.disabled = false;
+    }
 }
 
-// Cleanup on page unload
-window.addEventListener('unload', () => {
-    if (chatUnsubscribe) {
-        chatUnsubscribe();
+// Frame size modal functions
+window.showFrameSizeModal = function() {
+    document.getElementById('frameSizeModal').classList.add('active');
+    document.getElementById('frameSizeForm').reset();
+};
+
+window.closeFrameSizeModal = function() {
+    document.getElementById('frameSizeModal').classList.remove('active');
+    document.getElementById('frameSizeForm').reset();
+};
+
+window.addSizeImageUrlInput = function() {
+    const imageUrlInputs = document.getElementById('sizeImageUrlInputs');
+    const newInput = document.createElement('div');
+    newInput.className = 'image-url-group';
+    newInput.innerHTML = `
+        <div class="form-group">
+            <input type="text" class="frameSizeImageUrl" placeholder="Enter image URL" required>
+        </div>
+        <a href="https://imgbb.com/" target="_blank" class="convert-image-btn">
+            <i class="fas fa-image"></i>
+            Convert Image
+        </a>
+        <button type="button" class="remove-image-btn" onclick="this.parentElement.remove()">
+            <i class="fas fa-times"></i>
+        </button>
+    `;
+    imageUrlInputs.appendChild(newInput);
+};
+
+// Add event listener for frame size form submission
+document.getElementById('frameSizeForm')?.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const submitButton = e.target.querySelector('button[type="submit"]');
+    submitButton.disabled = true;
+    
+    try {
+        const size = document.getElementById('frameSize').value;
+        const imageUrls = Array.from(document.getElementsByClassName('frameSizeImageUrl'))
+            .map(input => input.value)
+            .filter(url => url.trim() !== '');
+
+        if (imageUrls.length === 0) {
+            throw new Error('Please add at least one image URL');
+        }
+
+        const frameSizeData = {
+            size,
+            images: imageUrls,
+            timestamp: Timestamp.now()
+        };
+
+        // Check if size already exists
+        const frameSizesRef = collection(db, "frameSizes");
+        const q = query(frameSizesRef);
+        const snapshot = await getDocs(q);
+        const existingSize = snapshot.docs.find(doc => doc.data().size === size);
+
+        if (existingSize) {
+            // Update existing size
+            await updateDoc(doc(frameSizesRef, existingSize.id), frameSizeData);
+        } else {
+            // Add new size
+            await addDoc(frameSizesRef, frameSizeData);
+        }
+        
+        closeFrameSizeModal();
+        showMessage('Frame size images saved successfully!', false);
+    } catch (error) {
+        console.error("Error saving frame size:", error);
+        showMessage(error.message || 'Error saving frame size. Please try again.', true);
+    } finally {
+        submitButton.disabled = false;
     }
 });

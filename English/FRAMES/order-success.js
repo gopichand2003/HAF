@@ -54,7 +54,6 @@ async function loadOrderDetails(orderId) {
       const order = userData.orders.find(o => o.id === orderId);
       
       if (order) {
-        // Ensure the order has the customer's name in the address
         if (!order.address.name) {
           order.address = {
             ...order.address,
@@ -76,7 +75,6 @@ async function loadOrderDetails(orderId) {
 }
 
 function renderOrderDetails(order) {
-  // Order Information
   document.getElementById('orderNumber').textContent = order.orderNumber;
   document.getElementById('orderDate').textContent = new Date(order.date).toLocaleString('en-IN', {
     year: 'numeric',
@@ -87,8 +85,13 @@ function renderOrderDetails(order) {
   });
   document.getElementById('orderStatus').textContent = order.status;
   document.getElementById('paymentMethod').textContent = order.paymentMethod;
+  
+  // Display payment ID if available
+  if (order.paymentId) {
+    document.getElementById('paymentIdContainer').style.display = 'block';
+    document.getElementById('paymentId').textContent = order.paymentId;
+  }
 
-  // Shipping Address
   const addressHtml = `
     <p><strong>${order.address.name}</strong></p>
     <p>${order.address.addressLine1}</p>
@@ -98,7 +101,6 @@ function renderOrderDetails(order) {
   `;
   document.getElementById('shippingAddress').innerHTML = addressHtml;
 
-  // Order Items
   const itemsHtml = order.items.map(item => `
     <div class="item-card">
       <div class="item-image">
@@ -106,6 +108,7 @@ function renderOrderDetails(order) {
       </div>
       <div class="item-details">
         <h4>${item.name}</h4>
+        ${item.customText ? `<p class="custom-text">Custom Text: "${item.customText}"</p>` : ''}
         <p>Quantity: ${item.quantity}</p>
       </div>
       <div class="item-price">
@@ -115,7 +118,6 @@ function renderOrderDetails(order) {
   `).join('');
   document.getElementById('itemsList').innerHTML = itemsHtml;
 
-  // Order Summary
   document.getElementById('subtotal').textContent = `₹${order.subtotal.toLocaleString()}`;
   document.getElementById('tax').textContent = `₹${order.tax.toLocaleString()}`;
   document.getElementById('total').textContent = `₹${order.total.toLocaleString()}`;
@@ -131,14 +133,11 @@ window.downloadInvoice = function() {
   const pageWidth = doc.internal.pageSize.getWidth();
   let yPos = 20;
 
-  // Helper function to add text with proper parameters
   const addText = (text, x, y, options = {}) => {
-    // Convert text to string and handle undefined/null
     const safeText = text != null ? text.toString() : '';
     doc.text(safeText, x, y, options);
   };
 
-  // Header
   doc.setFontSize(22);
   doc.setFont('helvetica', 'bold');
   addText('Holy Army Fellowship', pageWidth / 2, yPos, { align: 'center' });
@@ -147,14 +146,12 @@ window.downloadInvoice = function() {
   doc.setFontSize(16);
   addText('Invoice', pageWidth / 2, yPos, { align: 'center' });
 
-  // Order Details
   yPos += 20;
   doc.setFontSize(12);
   doc.setFont('helvetica', 'normal');
   addText(`Order #: ${orderData.orderNumber}`, 20, yPos);
   addText(`Date: ${new Date(orderData.date).toLocaleDateString('en-IN')}`, pageWidth - 20, yPos, { align: 'right' });
 
-  // Customer Details
   yPos += 15;
   doc.setFont('helvetica', 'bold');
   addText('Bill To:', 20, yPos);
@@ -172,8 +169,21 @@ window.downloadInvoice = function() {
   yPos += 7;
   addText(`Phone: ${orderData.address.phone}`, 20, yPos);
 
-  // Items Table
-  yPos += 20;
+  yPos += 15;
+  doc.setFont('helvetica', 'bold');
+  addText('Payment Method:', 20, yPos);
+  doc.setFont('helvetica', 'normal');
+  addText(orderData.paymentMethod, 100, yPos);
+  
+  if (orderData.paymentId) {
+    yPos += 7;
+    doc.setFont('helvetica', 'bold');
+    addText('Payment ID:', 20, yPos);
+    doc.setFont('helvetica', 'normal');
+    addText(orderData.paymentId, 100, yPos);
+  }
+
+  yPos += 15;
   doc.setFont('helvetica', 'bold');
   addText('Item', 20, yPos);
   addText('Qty', 120, yPos);
@@ -186,12 +196,17 @@ window.downloadInvoice = function() {
   doc.setFont('helvetica', 'normal');
   orderData.items.forEach(item => {
     addText(item.name, 20, yPos);
+    if (item.customText) {
+      yPos += 7;
+      doc.setFontSize(10);
+      addText(`Custom Text: "${item.customText}"`, 20, yPos);
+      doc.setFontSize(12);
+    }
     addText(item.quantity, 120, yPos);
     addText(`₹${(item.price * item.quantity).toLocaleString()}`, 160, yPos);
-    yPos += 10;
+    yPos += item.customText ? 13 : 10;
   });
 
-  // Summary
   yPos += 10;
   doc.line(120, yPos, pageWidth - 20, yPos);
   yPos += 10;
@@ -208,12 +223,10 @@ window.downloadInvoice = function() {
   addText('Total:', 120, yPos);
   addText(`₹${orderData.total.toLocaleString()}`, 160, yPos);
 
-  // Footer
   yPos = doc.internal.pageSize.getHeight() - 30;
   doc.setFontSize(10);
   doc.setFont('helvetica', 'normal');
   addText('Thank you for your purchase!', pageWidth / 2, yPos, { align: 'center' });
 
-  // Save the PDF
   doc.save(`HAF_Invoice_${orderData.orderNumber}.pdf`);
 };

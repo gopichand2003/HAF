@@ -378,7 +378,7 @@ footer {
   width: 60px;
   height: 60px;
   border-radius: 50%;
-  display: flex;
+  display: none; /* Initially hidden */
   align-items: center;
   justify-content: center;
   text-decoration: none;

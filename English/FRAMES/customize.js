@@ -1,7 +1,6 @@
-import { db, auth } from './firebase-config.js';
+import { db } from './firebase-config.js';
 import { doc, getDoc, updateDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-firestore.js";
 
-let currentLanguage = 'english';
 let selectedSize = "8x12";
 let unsubscribe = null;
 
@@ -13,11 +12,9 @@ document.addEventListener('DOMContentLoaded', () => {
     subscribeToCartUpdates(userId);
   }
   
-  setupLanguageSelector();
-  setupBibleSelectors();
+  setupTextInput();
   setupSizeSelector();
   setupNavigation();
-  updateBibleBooks();
 });
 
 function setupNavigation() {
@@ -56,74 +53,16 @@ function subscribeToCartUpdates(userId) {
   });
 }
 
-function setupLanguageSelector() {
-  const langButtons = document.querySelectorAll('.lang-btn');
-  langButtons.forEach(btn => {
-    btn.addEventListener('click', () => {
-      langButtons.forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      currentLanguage = btn.dataset.lang;
-      updateBibleBooks();
-      clearVerseSelections();
-    });
-  });
-}
-
-function updateBibleBooks() {
-  const bookSelect = document.getElementById('book');
-  if (!bookSelect) return;
-
-  const books = Object.keys(bibleData[currentLanguage]);
-  
-  bookSelect.innerHTML = `
-    <option value="">Select Book</option>
-    ${books.map(book => `
-      <option value="${book}">${book}</option>
-    `).join('')}
-  `;
-}
-
-function setupBibleSelectors() {
-  const bookSelect = document.getElementById('book');
-  const chapterSelect = document.getElementById('chapter');
-  const verseSelect = document.getElementById('verse');
+function setupTextInput() {
+  const frameText = document.getElementById('frameText');
+  const customText = document.getElementById('customText');
   const addToCartBtn = document.querySelector('.add-to-cart-btn');
 
-  bookSelect.addEventListener('change', () => {
-    const book = bookSelect.value;
-    if (book) {
-      updateChapters(book);
-      chapterSelect.disabled = false;
-    } else {
-      chapterSelect.disabled = true;
-      verseSelect.disabled = true;
-    }
-    clearVerseSelect();
-    updateButtonStates();
+  frameText.addEventListener('input', () => {
+    const text = frameText.value.trim();
+    customText.textContent = text;
+    addToCartBtn.disabled = !text;
   });
-
-  chapterSelect.addEventListener('change', () => {
-    const book = bookSelect.value;
-    const chapter = parseInt(chapterSelect.value);
-    if (chapter) {
-      updateVerses(book, chapter);
-      verseSelect.disabled = false;
-    } else {
-      verseSelect.disabled = true;
-    }
-    updateButtonStates();
-  });
-
-  verseSelect.addEventListener('change', () => {
-    if (verseSelect.value) {
-      updateVerseDisplay(bookSelect.value, chapterSelect.value, verseSelect.value);
-    }
-    updateButtonStates();
-  });
-
-  if (addToCartBtn) {
-    addToCartBtn.addEventListener('click', handleAddToCart);
-  }
 }
 
 function setupSizeSelector() {
@@ -139,48 +78,6 @@ function setupSizeSelector() {
       framePriceDisplay.textContent = `₹${price.toLocaleString()}`;
     });
   });
-}
-
-function updateChapters(book) {
-  const chapterSelect = document.getElementById('chapter');
-  const numChapters = bibleData[currentLanguage][book].chapters;
-  
-  chapterSelect.innerHTML = `
-    <option value="">Select Chapter</option>
-    ${Array.from({length: numChapters}, (_, i) => i + 1).map(num => `
-      <option value="${num}">${num}</option>
-    `).join('')}
-  `;
-}
-
-function updateVerses(book, chapter) {
-  const verseSelect = document.getElementById('verse');
-  const numVerses = bibleData[currentLanguage][book].verses[chapter];
-  
-  verseSelect.innerHTML = `
-    <option value="">Select Verse</option>
-    ${Array.from({length: numVerses}, (_, i) => i + 1).map(num => `
-      <option value="${num}">${num}</option>
-    `).join('')}
-  `;
-}
-
-function updateVerseDisplay(book, chapter, verse) {
-  const verseTextElement = document.getElementById('selectedVerse');
-  const verseReferenceElement = document.getElementById('verseReference');
-
-  // In a real app, you would have the actual verse text
-  verseTextElement.textContent = `Sample verse text for ${book} ${chapter}:${verse}`;
-  verseReferenceElement.textContent = `${book} ${chapter}:${verse}`;
-}
-
-function updateButtonStates() {
-  const verseSelected = document.getElementById('selectedVerse').textContent.trim() !== '';
-  const addToCartBtn = document.querySelector('.add-to-cart-btn');
-  
-  if (addToCartBtn) {
-    addToCartBtn.disabled = !verseSelected;
-  }
 }
 
 function showToast(message, isSuccess = true) {
@@ -208,30 +105,25 @@ async function handleAddToCart() {
   const userId = sessionStorage.getItem('loggedInUserId');
   if (!userId) return;
 
-  const verseText = document.getElementById('selectedVerse').textContent;
-  const verseReference = document.getElementById('verseReference').textContent;
+  const customText = document.getElementById('frameText').value.trim();
   const addToCartBtn = document.querySelector('.add-to-cart-btn');
 
-  if (!verseText || !verseReference) {
-    showToast('Please select a verse first', false);
+  if (!customText) {
+    showToast('Please enter your text first', false);
     return;
   }
 
+  // Disable button and show loading state
   addToCartBtn.disabled = true;
   addToCartBtn.classList.add('loading');
-  addToCartBtn.innerHTML = `
-    <span class="spinner"></span>
-    <span class="button-text">Adding to Cart...</span>
-  `;
 
   const frameItem = {
-    id: Date.now(),
-    name: `Custom-${verseReference} (${selectedSize})`,
+    id: Date.now().toString(),
+    name: 'Custom Frame',
     price: framePrices[selectedSize],
-    verse: verseText,
-    reference: verseReference,
+    customText: customText,
     size: selectedSize,
-    image: generateVerseImage(verseText, verseReference),
+    image: generateTextImage(customText),
     quantity: 1,
     isCustomFrame: true
   };
@@ -247,23 +139,23 @@ async function handleAddToCart() {
       await updateDoc(userRef, { cart });
       
       showToast('Added to cart!');
+      
+      // Clear the text input after successful add
+      document.getElementById('frameText').value = '';
+      document.getElementById('customText').textContent = '';
+      addToCartBtn.disabled = true;
     }
   } catch (error) {
     console.error('Error adding to cart:', error);
     showToast('Failed to add frame to cart. Please try again.', false);
   } finally {
+    // Reset button state
     addToCartBtn.disabled = false;
     addToCartBtn.classList.remove('loading');
-    addToCartBtn.innerHTML = `
-      <span class="button-text">
-        <i class="fas fa-shopping-cart"></i>
-        Add to Cart
-      </span>
-    `;
   }
 }
 
-function generateVerseImage(verse, reference) {
+function generateTextImage(text) {
   const canvas = document.createElement('canvas');
   const ctx = canvas.getContext('2d');
   canvas.width = 400;
@@ -277,7 +169,7 @@ function generateVerseImage(verse, reference) {
   ctx.textBaseline = 'middle';
 
   ctx.font = '20px "Playfair Display"';
-  const words = verse.split(' ');
+  const words = text.split(' ');
   let lines = [];
   let currentLine = words[0];
 
@@ -299,34 +191,7 @@ function generateVerseImage(verse, reference) {
     y += 30;
   });
 
-  ctx.font = '18px "Cinzel"';
-  ctx.fillText(reference, canvas.width/2, y + 20);
-
   return canvas.toDataURL();
-}
-
-function clearVerseSelections() {
-  const chapterSelect = document.getElementById('chapter');
-  const verseSelect = document.getElementById('verse');
-  const selectedVerse = document.getElementById('selectedVerse');
-  const verseReference = document.getElementById('verseReference');
-
-  if (chapterSelect) chapterSelect.innerHTML = '<option value="">Select Chapter</option>';
-  if (verseSelect) verseSelect.innerHTML = '<option value="">Select Verse</option>';
-  if (selectedVerse) selectedVerse.textContent = '';
-  if (verseReference) verseReference.textContent = '';
-  updateButtonStates();
-}
-
-function clearVerseSelect() {
-  const verseSelect = document.getElementById('verse');
-  const selectedVerse = document.getElementById('selectedVerse');
-  const verseReference = document.getElementById('verseReference');
-
-  if (verseSelect) verseSelect.innerHTML = '<option value="">Select Verse</option>';
-  if (selectedVerse) selectedVerse.textContent = '';
-  if (verseReference) verseReference.textContent = '';
-  updateButtonStates();
 }
 
 function updateCartCount(cart) {
@@ -336,51 +201,17 @@ function updateCartCount(cart) {
   }
 }
 
-// Bible data structure
-const bibleData = {
-  english: {
-    Genesis: {
-      chapters: 50,
-      verses: {
-        1: 31, 2: 25, 3: 24, 4: 26, 5: 32, 6: 22, 7: 24, 8: 22, 9: 29, 10: 32,
-        11: 32, 12: 20, 13: 18, 14: 24, 15: 21, 16: 16, 17: 27, 18: 33, 19: 38, 20: 18,
-        21: 34, 22: 24, 23: 20, 24: 67, 25: 34, 26: 35, 27: 46, 28: 22, 29: 35, 30: 43,
-        31: 55, 32: 32, 33: 20, 34: 31, 35: 29, 36: 43, 37: 36, 38: 30, 39: 23, 40: 23,
-        41: 57, 42: 38, 43: 34, 44: 34, 45: 28, 46: 34, 47: 31, 48: 22, 49: 33, 50: 26
-      }
-    },
-    Exodus: {
-      chapters: 40,
-      verses: {
-        1: 22, 2: 25, 3: 22, 4: 31, 5: 23, 6: 30, 7: 25, 8: 32, 9: 35, 10: 29,
-        11: 10, 12: 51, 13: 22, 14: 31, 15: 27, 16: 36, 17: 16, 18: 27, 19: 25, 20: 26,
-        21: 37, 22: 31, 23: 33, 24: 18, 25: 40, 26: 37, 27: 21, 28: 43, 29: 46, 30: 38,
-        31: 18, 32: 35, 33: 23, 34: 35, 35: 35, 36: 38, 37: 29, 38: 31, 39: 43, 40: 38
-      }
-    }
-  },
-  telugu: {
-    "ఆదికాండము": {
-      chapters: 50,
-      verses: {
-        1: 31, 2: 25, 3: 24, 4: 26, 5: 32, 6: 22, 7: 24, 8: 22, 9: 29, 10: 32,
-        11: 32, 12: 20, 13: 18, 14: 24, 15: 21, 16: 16, 17: 27, 18: 33, 19: 38, 20: 18,
-        21: 34, 22: 24, 23: 20, 24: 67, 25: 34, 26: 35, 27: 46, 28: 22, 29: 35, 30: 43,
-        31: 55, 32: 32, 33: 20, 34: 31, 35: 29, 36: 43, 37: 36, 38: 30, 39: 23, 40: 23,
-        41: 57, 42: 38, 43: 34, 44: 34, 45: 28, 46: 34, 47: 31, 48: 22, 49: 33, 50: 26
-      }
-    }
-  }
-};
-
 const framePrices = {
   "8x12": 200,
   "10x15": 320,
   "8x18": 280,
   "12x18": 380,
   "12x24": 700,
-  "18x36": 2800 // Premium size
+  "18x36": 2800
 };
+
+// Add event listener for the Add to Cart button
+document.querySelector('.add-to-cart-btn')?.addEventListener('click', handleAddToCart);
 
 // Cleanup on page unload
 window.addEventListener('unload', () => {

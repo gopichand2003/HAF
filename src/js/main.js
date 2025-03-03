@@ -235,89 +235,89 @@ return date;
 
 // Calendar functions
 function addToGoogleCalendar(title, description, location, start, end) {
-// If it's the Sunday Service, calculate the next Sunday
-if (title === 'Sunday Service') {
-  const nextSunday = getNextSunday();
-  const startTime = new Date(nextSunday);
-  startTime.setHours(9, 0, 0); // 9:00 AM
-  const endTime = new Date(nextSunday);
-  endTime.setHours(12, 0, 0); // 12:00 PM
+  // If it's the Sunday Service, calculate the next Sunday
+  if (title === 'Sunday Service') {
+    const nextSunday = getNextSunday();
+    const startTime = new Date(nextSunday);
+    startTime.setHours(9, 30, 0); // 9:30 AM
+    const endTime = new Date(nextSunday);
+    endTime.setHours(13, 0, 0); // 1:00 PM
 
-  start = startTime.toISOString();
-  end = endTime.toISOString();
-}
-// All Night service logic
-else if (title === 'All Night Service') {
-  const nextService = getNextSecondSaturday();
-  const startTime = new Date(nextService);
-  startTime.setHours(9, 0, 0); // 9:00 AM
-  const endTime = new Date(nextService);
-  endTime.setHours(14, 30, 0); // 2:30 PM
+    start = startTime.toISOString();
+    end = endTime.toISOString();
+  }
+  // All Night service logic
+  else if (title === 'All Night Service') {
+    const nextService = getNextSecondSaturday();
+    const startTime = new Date(nextService);
+    startTime.setHours(9, 30, 0); // 9:30 AM
+    const endTime = new Date(nextService);
+    endTime.setHours(14, 30, 0); // 2:30 PM
 
-  start = startTime.toISOString();
-  end = endTime.toISOString();
-}
+    start = startTime.toISOString();
+    end = endTime.toISOString();
+  }
+  
+  const baseUrl = 'https://calendar.google.com/calendar/render?action=TEMPLATE';
+  const eventDetails = {
+    text: title,
+    details: description,
+    location: location,
+    dates: `${start}/${end}`.replace(/[-:]/g, ''),
+  };
 
-const baseUrl = 'https://calendar.google.com/calendar/render?action=TEMPLATE';
-const eventDetails = {
-  text: title,
-  details: description,
-  location: location,
-  dates: `${start}/${end}`.replace(/[-:]/g, ''),
-};
+  const url = `${baseUrl}&text=${encodeURIComponent(
+    eventDetails.text
+  )}&details=${encodeURIComponent(
+    eventDetails.details
+  )}&location=${encodeURIComponent(eventDetails.location)}&dates=${
+    eventDetails.dates
+  }`;
 
-const url = `${baseUrl}&text=${encodeURIComponent(
-  eventDetails.text
-)}&details=${encodeURIComponent(
-  eventDetails.details
-)}&location=${encodeURIComponent(eventDetails.location)}&dates=${
-  eventDetails.dates
-}`;
-
-window.open(url, '_blank');
+  window.open(url, '_blank');
 }
 
 function downloadICSFile(title, description, location, start, end) {
-// If it's the Sunday Service, calculate the next Sunday
-if (title === 'Sunday Service') {
-  const nextSunday = getNextSunday();
-  const startTime = new Date(nextSunday);
-  startTime.setHours(9, 0, 0); // 9:00 AM
-  const endTime = new Date(nextSunday);
-  endTime.setHours(12, 0, 0); // 12:00 PM
+  // If it's the Sunday Service, calculate the next Sunday
+  if (title === 'Sunday Service') {
+    const nextSunday = getNextSunday();
+    const startTime = new Date(nextSunday);
+    startTime.setHours(9, 30, 0); // 9:30 AM
+    const endTime = new Date(nextSunday);
+    endTime.setHours(13, 0, 0); // 1:00 PM
 
-  start = startTime.toISOString();
-  end = endTime.toISOString();
-}
-// All Night service logic
-else if (title === 'All Night Service') {
-  const nextService = getNextSecondSaturday();
-  const startTime = new Date(nextService);
-  startTime.setHours(9, 0, 0); // 9:00 AM
-  const endTime = new Date(nextService);
-  endTime.setHours(14, 30, 0); // 2:30 PM
+    start = startTime.toISOString();
+    end = endTime.toISOString();
+  }
+  // All Night service logic
+  else if (title === 'All Night Service') {
+    const nextService = getNextSecondSaturday();
+    const startTime = new Date(nextService);
+    startTime.setHours(9, 30, 0); // 9:30 AM
+    const endTime = new Date(nextService);
+    endTime.setHours(14, 30, 0); // 2:30 PM
 
-  start = startTime.toISOString();
-  end = endTime.toISOString();
-}
+    start = startTime.toISOString();
+    end = endTime.toISOString();
+  }
+  
+  const event = {
+    start: new Date(start),
+    end: new Date(end),
+    title: title,
+    description: description,
+    location: location,
+    url: 'https://holyarmyfellowship.org',
+  };
 
-const event = {
-  start: new Date(start),
-  end: new Date(end),
-  title: title,
-  description: description,
-  location: location,
-  url: 'https://holyarmyfellowship.org',
-};
-
-const icsContent = generateICSFile(event);
-const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
-const link = document.createElement('a');
-link.href = window.URL.createObjectURL(blob);
-link.download = `${title.toLowerCase().replace(/\s+/g, '-')}.ics`;
-document.body.appendChild(link);
-link.click();
-document.body.removeChild(link);
+  const icsContent = generateICSFile(event);
+  const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
+  const link = document.createElement('a');
+  link.href = window.URL.createObjectURL(blob);
+  link.download = `${title.toLowerCase().replace(/\s+/g, '-')}.ics`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
 }
 
 function generateICSFile(event) {

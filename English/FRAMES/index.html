@@ -35,6 +35,9 @@
         <div class="form-group">
           <input type="password" id="password" placeholder=" " required>
           <label for="password">Password</label>
+          <button type="button" class="password-toggle" onclick="togglePasswordVisibility('password')">
+            <i class="fas fa-eye"></i>
+          </button>
         </div>
 
         <button type="submit" class="auth-button" id="submitSignIn">
@@ -42,6 +45,14 @@
           <i class="fas fa-arrow-right"></i>
         </button>
       </form>
+
+      <div class="social-auth">
+        <p>Or sign in with</p>
+        <button type="button" class="google-auth-btn" id="googleSignIn">
+          <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
+          Sign in with Google
+        </button>
+      </div>
 
       <div class="auth-links">
         <p>Don't have an account? <a href="#" id="signUpButton">Sign Up</a></p>
@@ -75,8 +86,16 @@
         </div>
 
         <div class="form-group">
+          <input type="tel" id="mobileNumber" placeholder=" " pattern="[0-9]{10}" required>
+          <label for="mobileNumber">Mobile Number (10 digits)</label>
+        </div>
+
+        <div class="form-group">
           <input type="password" id="rPassword" placeholder=" " required>
           <label for="rPassword">Password</label>
+          <button type="button" class="password-toggle" onclick="togglePasswordVisibility('rPassword')">
+            <i class="fas fa-eye"></i>
+          </button>
         </div>
 
         <button type="submit" class="auth-button" id="submitSignUp">
@@ -84,6 +103,14 @@
           <i class="fas fa-arrow-right"></i>
         </button>
       </form>
+
+      <div class="social-auth">
+        <p>Or sign up with</p>
+        <button type="button" class="google-auth-btn" id="googleSignUp">
+          <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
+          Sign up with Google
+        </button>
+      </div>
 
       <div class="auth-links">
         <p>Already have an account? <a href="#" id="signInButton">Sign In</a></p>

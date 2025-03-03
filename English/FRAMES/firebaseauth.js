@@ -1,6 +1,11 @@
 import { auth, db } from './firebase-config.js';
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-auth.js";
-import { doc, setDoc } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-firestore.js";
+import { 
+    createUserWithEmailAndPassword, 
+    signInWithEmailAndPassword, 
+    GoogleAuthProvider, 
+    signInWithPopup 
+} from "https://www.gstatic.com/firebasejs/10.11.1/firebase-auth.js";
+import { doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-firestore.js";
 
 function showMessage(message, divId, isSuccess = false) {
     var messageDiv = document.getElementById(divId);
@@ -13,6 +18,7 @@ function showMessage(message, divId, isSuccess = false) {
     }, 5000);
 }
 
+// Email/Password Sign Up
 const signUp = document.getElementById('submitSignUp');
 signUp.addEventListener('click', (event) => {
     event.preventDefault();
@@ -20,6 +26,13 @@ signUp.addEventListener('click', (event) => {
     const password = document.getElementById('rPassword').value;
     const firstName = document.getElementById('fName').value;
     const lastName = document.getElementById('lName').value;
+    const mobileNumber = document.getElementById('mobileNumber').value;
+
+    // Validate mobile number
+    if (!/^\d{10}$/.test(mobileNumber)) {
+        showMessage('Please enter a valid 10-digit mobile number', 'signUpMessage');
+        return;
+    }
 
     createUserWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
@@ -27,7 +40,8 @@ signUp.addEventListener('click', (event) => {
             const userData = {
                 email: email,
                 firstName: firstName,
-                lastName: lastName
+                lastName: lastName,
+                phone: mobileNumber
             };
             showMessage('Account Created Successfully', 'signUpMessage', true);
             const docRef = doc(db, "users", user.uid);
@@ -53,6 +67,7 @@ signUp.addEventListener('click', (event) => {
         });
 });
 
+// Email/Password Sign In
 const signIn = document.getElementById('submitSignIn');
 signIn.addEventListener('click', (event) => {
     event.preventDefault();
@@ -101,3 +116,70 @@ signIn.addEventListener('click', (event) => {
             showMessage(errorMessage, 'signInMessage');
         });
 });
+
+// Google Authentication
+const googleProvider = new GoogleAuthProvider();
+
+// Google Sign In
+const googleSignIn = document.getElementById('googleSignIn');
+googleSignIn.addEventListener('click', () => {
+    handleGoogleAuth('signInMessage');
+});
+
+// Google Sign Up
+const googleSignUp = document.getElementById('googleSignUp');
+googleSignUp.addEventListener('click', () => {
+    handleGoogleAuth('signUpMessage');
+});
+
+async function handleGoogleAuth(messageDiv) {
+    try {
+        const result = await signInWithPopup(auth, googleProvider);
+        const user = result.user;
+        
+        // Check if user exists in Firestore
+        const userRef = doc(db, "users", user.uid);
+        const userDoc = await getDoc(userRef);
+        
+        if (!userDoc.exists()) {
+            // New user - create profile
+            const nameParts = user.displayName ? user.displayName.split(' ') : ['User', ''];
+            const userData = {
+                email: user.email,
+                firstName: nameParts[0],
+                lastName: nameParts.slice(1).join(' '),
+                photoURL: user.photoURL || null
+            };
+            
+            // For Google sign-up, we'll prompt for mobile number after successful authentication
+            await setDoc(userRef, userData);
+            showMessage('Account Created Successfully', messageDiv, true);
+            
+            // Store user ID and redirect to a page to collect mobile number
+            sessionStorage.setItem('loggedInUserId', user.uid);
+            sessionStorage.setItem('needsMobileNumber', 'true');
+            
+            setTimeout(() => {
+                window.location.href = 'profile.html';
+            }, 1000);
+        } else {
+            showMessage('Login successful', messageDiv, true);
+            
+            setTimeout(() => {
+                sessionStorage.setItem('loggedInUserId', user.uid);
+                window.location.href = 'homepage.html';
+            }, 1000);
+        }
+    } catch (error) {
+        console.error("Google auth error:", error);
+        let errorMessage = 'Authentication failed. Please try again.';
+        
+        if (error.code === 'auth/popup-closed-by-user') {
+            errorMessage = 'Sign in was cancelled.';
+        } else if (error.code === 'auth/popup-blocked') {
+            errorMessage = 'Pop-up was blocked by your browser. Please allow pop-ups for this site.';
+        }
+        
+        showMessage(errorMessage, messageDiv);
+    }
+}

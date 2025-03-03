@@ -17,6 +17,21 @@ document.addEventListener('DOMContentLoaded', () => {
     setupAddressModal();
     setupPhoneModal();
     setupNavigation();
+    
+    // Check if user needs to add mobile number (for Google sign-in users)
+    if (sessionStorage.getItem('needsMobileNumber') === 'true') {
+        // Show phone modal automatically
+        document.getElementById('phoneModal').classList.add('active');
+        // Add a message to inform the user
+        const phoneForm = document.getElementById('phoneForm');
+        const messageDiv = document.createElement('div');
+        messageDiv.className = 'phone-prompt-message';
+        messageDiv.innerHTML = 'Please add your mobile number to complete your profile.';
+        phoneForm.insertBefore(messageDiv, phoneForm.firstChild);
+        
+        // Remove the flag from session storage
+        sessionStorage.removeItem('needsMobileNumber');
+    }
 });
 
 function setupNavigation() {
@@ -357,7 +372,19 @@ async function handlePhoneSubmit(e) {
         const userRef = doc(db, "users", currentUser.id);
         await updateDoc(userRef, { phone });
         document.getElementById('profilePhone').textContent = phone;
-        closePhoneModal();
+        
+        // Show success message
+        const successMessage = document.createElement('div');
+        successMessage.className = 'phone-success-message';
+        successMessage.textContent = 'Phone number updated successfully!';
+        const phoneForm = document.getElementById('phoneForm');
+        phoneForm.insertBefore(successMessage, phoneForm.firstChild);
+        
+        // Remove message after 2 seconds and close modal
+        setTimeout(() => {
+            successMessage.remove();
+            closePhoneModal();
+        }, 2000);
     } catch (error) {
         console.error("Error updating phone number:", error);
         alert('Failed to update phone number. Please try again.');
@@ -367,6 +394,10 @@ async function handlePhoneSubmit(e) {
 window.closePhoneModal = function() {
     document.getElementById('phoneModal').classList.remove('active');
     document.getElementById('phoneForm').reset();
+    
+    // Remove any messages
+    const messages = document.querySelectorAll('.phone-prompt-message, .phone-success-message');
+    messages.forEach(msg => msg.remove());
 };
 
 // Cleanup on page unload

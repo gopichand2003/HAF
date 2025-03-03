@@ -37,9 +37,9 @@
             <i class="fas fa-shopping-bag"></i>
             Orders
           </a>
-          <a href="#" class="nav-btn" data-section="requests">
-            <i class="fas fa-comments"></i>
-            Support Requests
+          <a href="admin-support.html" class="nav-btn">
+            <i class="fas fa-headset"></i>
+            Support
           </a>
           <a href="analytics.html" class="nav-btn">
             <i class="fas fa-chart-line"></i>
@@ -73,6 +73,12 @@
             </div>
             <button class="add-item-btn" onclick="showAddItemModal()">
               <i class="fas fa-plus"></i> Add New Item
+            </button>
+            <button class="add-frame-btn" onclick="showFrameTypeModal()">
+              <i class="fas fa-plus"></i> Add New Frame Type
+            </button>
+            <button class="add-frame-btn" onclick="showFrameSizeModal()">
+              <i class="fas fa-plus"></i> Add Frame Size Images
             </button>
           </div>
         </div>
@@ -119,14 +125,10 @@
 
               <div class="form-row">
                 <div class="form-group">
-                  <label for="itemMaterial">Select Material</label>
+                  <label for="itemMaterial">Select Frame Type</label>
                   <select id="itemMaterial" required>
-                    <option value="">Select Material</option>
-                    <option value="wood">Wood</option>
-                    <option value="metal">Metal</option>
-                    <option value="glass">Glass</option>
-                    <option value="plastic">Plastic</option>
-                    <option value="paper">Paper</option>
+                    <option value="">Select Frame Type</option>
+                    <!-- Frame types will be loaded dynamically -->
                   </select>
                 </div>
 
@@ -134,9 +136,12 @@
                   <label for="itemSize">Select Size</label>
                   <select id="itemSize" required>
                     <option value="">Select Size</option>
-                    <option value="8x10">8" x 10"</option>
-                    <option value="11x14">11" x 14"</option>
-                    <option value="16x20">16" x 20"</option>
+                    <option value="8x12">8" x 12"</option>
+                    <option value="8x18">8" x 18"</option>
+                    <option value="10x15">10" x 15"</option>
+                    <option value="12x18">12" x 18"</option>
+                    <option value="12x24">12" x 24"</option>
+                    <option value="18x36">18" x 36" (Premium)</option>
                   </select>
                 </div>
               </div>
@@ -144,6 +149,93 @@
               <div class="modal-buttons">
                 <button type="button" class="cancel-btn" onclick="closeItemModal()">Cancel</button>
                 <button type="submit" class="save-btn">Save Item</button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- Frame Type Modal -->
+        <div id="frameTypeModal" class="modal">
+          <div class="modal-content">
+            <h3 id="frameTypeModalTitle">Add New Frame Type</h3>
+            <form id="frameTypeForm">
+              <div class="form-group">
+                <label for="frameTypeName">Frame Type Name</label>
+                <input type="text" id="frameTypeName" required>
+              </div>
+
+              <div class="form-group">
+                <label for="frameDescription">Description</label>
+                <textarea id="frameDescription" required></textarea>
+              </div>
+
+              <div class="image-urls-container">
+                <h4>Frame Images</h4>
+                <p class="image-hint">Add multiple images to showcase different views of the frame type</p>
+                <div id="imageUrlInputs">
+                  <div class="image-url-group">
+                    <div class="form-group">
+                      <input type="text" class="frameImageUrl" placeholder="Enter image URL" required>
+                    </div>
+                    <a href="https://imgbb.com/" target="_blank" class="convert-image-btn">
+                      <i class="fas fa-image"></i>
+                      Convert Image
+                    </a>
+                  </div>
+                </div>
+                <button type="button" class="add-image-url-btn" onclick="addImageUrlInput()">
+                  <i class="fas fa-plus"></i> Add Another Image
+                </button>
+              </div>
+
+              <div class="modal-buttons">
+                <button type="button" class="cancel-btn" onclick="closeFrameTypeModal()">Cancel</button>
+                <button type="submit" class="save-btn">Save Frame Type</button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- Frame Size Modal -->
+        <div id="frameSizeModal" class="modal">
+          <div class="modal-content">
+            <h3>Add Frame Size Images</h3>
+            <form id="frameSizeForm">
+              <div class="form-group">
+                <label for="frameSize">Select Frame Size</label>
+                <select id="frameSize" required>
+                  <option value="">Select Size</option>
+                  <option value="8x12">8" x 12"</option>
+                  <option value="8x18">8" x 18"</option>
+                  <option value="10x15">10" x 15"</option>
+                  <option value="12x18">12" x 18"</option>
+                  <option value="12x24">12" x 24"</option>
+                  <option value="18x36">18" x 36" (Premium)</option>
+                </select>
+              </div>
+
+              <div class="image-urls-container">
+                <h4>Size Images</h4>
+                <p class="image-hint">Add multiple images to showcase frames of this size</p>
+                <div id="sizeImageUrlInputs">
+                  <div class="image-url-group">
+                    <div class="form-group">
+                      <input type="text" class="frameSizeImageUrl" placeholder="Enter image URL" required>
+                    </div>
+                    <a href="https://imgbb.com/" target="_blank" class="convert-image-btn">
+                      <i class="fas fa-image"></i>
+                      Convert Image
+                    </a>
+                  </div>
+                </div>
+                <button type="button" class="add-image-url-btn" onclick="addSizeImageUrlInput()">
+                  <i class="fas fa-plus"></i> Add Another Image
+                </button>
+              </div>
+
+              <div class="modal-buttons">
+                <button type="button" class="cancel-btn" onclick="closeFrameSizeModal()">Cancel</button>
+                <button type="submit" class="save-btn">Save Size Images</button>
               </div>
             </form>
           </div>
@@ -186,42 +278,6 @@
           </tbody>
         </table>
       </section>
-
-      <!-- Support Requests Section -->
-      <section class="requests-section" id="requestsSection" style="display: none;">
-        <div class="requests-header">
-          <h3>Support Requests</h3>
-          <div class="search-requests">
-            <input type="text" placeholder="Search users..." id="searchRequests">
-            <button type="button">
-              <i class="fas fa-search"></i>
-            </button>
-          </div>
-        </div>
-
-        <div class="chat-container">
-          <div class="users-list" id="usersList">
-            <!-- Users with chat history will be loaded here -->
-          </div>
-
-          <div class="chat-window">
-            <div class="chat-header" id="chatHeader">
-              <h4>Select a user to view conversation</h4>
-            </div>
-            <div class="chat-messages" id="chatMessages">
-              <!-- Chat messages will be loaded here -->
-            </div>
-            <form id="adminChatForm" class="chat-form">
-              <div class="message-input">
-                <input type="text" id="adminMessageInput" placeholder="Type your reply..." required disabled>
-                <button type="submit" disabled>
-                  <i class="fas fa-paper-plane"></i>
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      </section>
     </div>
   </main>
 
@@ -240,11 +296,12 @@
     </div>
   </div>
 
-  <!-- Floating Support Request Button -->
-  <a href="#" class="floating-request-btn" onclick="document.querySelector('.nav-btn[data-section=\'requests\']').click(); return false;">
-    <i class="fas fa-comments"></i>
-  </a>
+<!-- Floating Support Button -->
+<a href="admin-support.html" class="floating-support-btn">
+  <i class="fas fa-headset"></i>
+  <span class="unread-count" id="adminUnreadCount">0</span>
+</a>
 
-  <script src="admin-dashboard.js" type="module"></script>
+<script src="admin-dashboard.js" type="module"></script>
 </body>
 </html>

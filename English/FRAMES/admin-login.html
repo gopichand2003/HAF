@@ -34,6 +34,9 @@
         <div class="form-group">
           <input type="password" id="adminPassword" placeholder=" " required>
           <label for="adminPassword">Password</label>
+          <button type="button" class="password-toggle" onclick="togglePasswordVisibility('adminPassword')">
+            <i class="fas fa-eye"></i>
+          </button>
         </div>
 
         <button type="submit" class="auth-button">
@@ -49,6 +52,7 @@
     <i class="fas fa-user"></i>
   </a>
 
-  <script src="admin-auth.js" type="module"></script>
+  <script src="script.js"></script>
+  <script type="module" src="admin-auth.js"></script>
 </body>
 </html>

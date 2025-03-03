@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>Order Success - Holy Army Fellowship</title>
+  <title>Frame Details - Holy Army Fellowship</title>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width" />
   <link rel="stylesheet" href="style.css" />
-  <link rel="stylesheet" href="order-success.css" />
+  <link rel="stylesheet" href="frames.css" />
+  <link rel="stylesheet" href="frame-details.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"/>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Playfair+Display:wght@400;700;900&display=swap" rel="stylesheet"/>
 </head>
@@ -35,10 +36,6 @@
           <i class="fas fa-user"></i>
           Profile
         </a>
-        <a href="#help">
-          <i class="fas fa-question-circle"></i>
-          Help
-        </a>
         <button id="logout">
           <i class="fas fa-sign-out-alt"></i>
           Logout
@@ -47,66 +44,61 @@
     </div>
   </nav>
 
-  <main class="success-page">
-    <div class="success-container">
-      <div class="success-header">
-        <div class="success-icon">
-          <i class="fas fa-check-circle"></i>
+  <main class="frame-details-page">
+    <div class="frame-details-container">
+      <div class="frame-gallery">
+        <div class="main-image">
+          <img id="mainImage" src="" alt="Frame">
         </div>
-        <h1>Order Placed Successfully!</h1>
-        <p>Thank you for your purchase. Your order has been confirmed.</p>
+        <div class="thumbnail-list" id="thumbnailList">
+          <!-- Thumbnails will be loaded here -->
+        </div>
       </div>
-
-      <div class="order-details">
-        <div class="order-info">
-          <div class="info-group">
-            <h3>Order Information</h3>
-            <p>Order #: <span id="orderNumber"></span></p>
-            <p>Date: <span id="orderDate"></span></p>
-            <p>Status: <span id="orderStatus" class="status-badge"></span></p>
-            <p>Payment Method: <span id="paymentMethod"></span></p>
-            <p id="paymentIdContainer" style="display: none;">Payment ID: <span id="paymentId"></span></p>
-          </div>
-
-          <div class="info-group">
-            <h3>Shipping Address</h3>
-            <div id="shippingAddress"></div>
+      
+      <div class="frame-info">
+        <h1 id="frameName"></h1>
+        <div class="frame-price">₹<span id="framePrice"></span></div>
+        <div class="frame-stock" id="frameStock"></div>
+        
+        <div class="frame-type-info">
+          <h3>Frame Type</h3>
+          <p id="frameTypeDescription"></p>
+        </div>
+        
+        <div class="frame-description">
+          <h3>Description</h3>
+          <p id="frameDescription"></p>
+        </div>
+        
+        <div class="frame-specs">
+          <h3>Specifications</h3>
+          <div class="spec-grid">
+            <div class="spec-item">
+              <span class="spec-label">Size</span>
+              <span class="spec-value" id="frameSize"></span>
+            </div>
+            <div class="spec-item">
+              <span class="spec-label">Material</span>
+              <span class="spec-value" id="frameMaterial"></span>
+            </div>
           </div>
         </div>
-
-        <div class="order-items">
-          <h3>Order Items</h3>
-          <div id="itemsList"></div>
-        </div>
-
-        <div class="order-summary">
-          <div class="summary-row">
-            <span>Subtotal:</span>
-            <span id="subtotal"></span>
-          </div>
-          <div class="summary-row">
-            <span>Tax (18%):</span>
-            <span id="tax"></span>
-          </div>
-          <div class="summary-row total">
-            <span>Total Amount:</span>
-            <span id="total"></span>
-          </div>
-        </div>
-
-        <div class="action-buttons">
-          <button onclick="downloadInvoice()" class="download-btn">
-            <i class="fas fa-download"></i>
-            Download Invoice
+        
+        <div class="frame-actions">
+          <button id="addToCartBtn" class="add-to-cart-btn">
+            <i class="fas fa-shopping-cart"></i>
+            Add to Cart
           </button>
-          <a href="homepage.html" class="continue-btn">
-            <i class="fas fa-shopping-bag"></i>
-            Continue Shopping
-          </a>
         </div>
       </div>
     </div>
   </main>
+
+  <!-- Floating Cart Button -->
+  <a href="cart-english.html" class="floating-cart-btn">
+    <i class="fas fa-shopping-cart"></i>
+    <span class="cart-count">0</span>
+  </a>
 
   <footer>
     <div class="footer-content">
@@ -139,6 +131,6 @@
   </footer>
 
   <script src="auth.js"></script>
-  <script type="module" src="order-success.js"></script>
+  <script type="module" src="frame-details.js"></script>
 </body>
 </html>
