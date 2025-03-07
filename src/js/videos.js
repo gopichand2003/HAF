@@ -267,4 +267,62 @@ document.addEventListener('DOMContentLoaded', () => {
       stopCurrentVideo();
     }
   });
+  // Add these functions to the existing videos.js file, just before the DOMContentLoaded event listener
+
+function shuffleArray(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
+}
+
+function sortByLatest(cards) {
+  return Array.from(cards).sort((a, b) => {
+    const dateA = a.querySelector('.message-date')?.textContent || '';
+    const dateB = b.querySelector('.message-date')?.textContent || '';
+    return new Date(dateB) - new Date(dateA);
+  });
+}
+
+// Add this code inside the DOMContentLoaded event listener, after the category filtering code
+
+// Add control buttons to sections
+document.querySelectorAll('.video-section').forEach(section => {
+  const sectionContent = section.querySelector('.section-content');
+  const searchBox = section.querySelector('.search-box');
+  
+  const controls = document.createElement('div');
+  controls.className = 'video-controls';
+  
+  const latestBtn = document.createElement('button');
+  latestBtn.className = 'control-btn';
+  latestBtn.innerHTML = '<i class="fas fa-clock"></i> Latest';
+  
+  const shuffleBtn = document.createElement('button');
+  shuffleBtn.className = 'control-btn';
+  shuffleBtn.innerHTML = '<i class="fas fa-random"></i> Shuffle';
+  
+  controls.appendChild(latestBtn);
+  controls.appendChild(shuffleBtn);
+  
+  searchBox.after(controls);
+  
+  const videoGrid = section.querySelector('.video-grid');
+  const cards = videoGrid.querySelectorAll('.video-card');
+  
+  shuffleBtn.addEventListener('click', () => {
+    stopCurrentVideo();
+    const shuffledCards = shuffleArray(Array.from(cards));
+    videoGrid.innerHTML = '';
+    shuffledCards.forEach(card => videoGrid.appendChild(card));
+  });
+  
+  latestBtn.addEventListener('click', () => {
+    stopCurrentVideo();
+    const sortedCards = sortByLatest(cards);
+    videoGrid.innerHTML = '';
+    sortedCards.forEach(card => videoGrid.appendChild(card));
+  });
+});
 });

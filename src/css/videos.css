@@ -472,3 +472,40 @@
     transform: translateY(0);
   }
 }
+/* Add these styles to the existing videos.css file */
+
+.video-controls {
+  display: flex;
+  gap: 1rem;
+  margin: 1rem 0;
+  justify-content: flex-end;
+}
+
+.control-btn {
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+}
+
+.control-btn:hover {
+  background: var(--secondary-color);
+  transform: translateY(-2px);
+}
+
+.control-btn i {
+  font-size: 1rem;
+}
+
+@media (max-width: 768px) {
+  .video-controls {
+    justify-content: center;
+  }
+}
