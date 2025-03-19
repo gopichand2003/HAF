@@ -5,16 +5,31 @@
 }
 
 .testimonies-hero {
-  background: linear-gradient(to right, rgba(44, 74, 124, 0.05), rgba(44, 74, 124, 0.1));
+  background: linear-gradient(135deg, rgba(44, 74, 124, 0.1) 0%, rgba(44, 74, 124, 0.05) 100%);
   padding: 3rem 2rem;
   text-align: center;
   margin-bottom: 2rem;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid rgba(44, 74, 124, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.testimonies-hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at center, rgba(44, 74, 124, 0.1) 0%, transparent 70%);
+  z-index: 0;
 }
 
 .testimonies-hero-content {
   max-width: 800px;
   margin: 0 auto;
+  position: relative;
+  z-index: 1;
 }
 
 .testimonies-hero h1 {
@@ -22,6 +37,7 @@
   margin-bottom: 1rem;
   font-family: 'Cinzel', serif;
   color: var(--primary-color);
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .testimonies-hero p {
@@ -41,28 +57,31 @@
   background: white;
   border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  display: grid;
-  grid-template-columns: 200px 1fr;
-  transition: transform 0.3s ease;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  border: 1px solid rgba(44, 74, 124, 0.1);
+  position: relative;
+}
+
+.testimony-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+  opacity: 0;
+  transition: opacity 0.3s ease;
 }
 
 .testimony-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
 }
 
-.testimony-image {
-  position: relative;
-  overflow: hidden;
-  height: 100%;
-}
-
-.testimony-image img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.3s ease;
+.testimony-card:hover::before {
+  opacity: 1;
 }
 
 .testimony-content {
@@ -72,9 +91,25 @@
 }
 
 .testimony-header {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
   margin-bottom: 1.5rem;
-  border-bottom: 2px solid var(--primary-color);
   padding-bottom: 1rem;
+  border-bottom: 2px solid rgba(44, 74, 124, 0.1);
+}
+
+.testimony-header i {
+  font-size: 2.5rem;
+  color: var(--primary-color);
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.header-text {
+  flex: 1;
 }
 
 .testimony-header h3 {
@@ -101,7 +136,7 @@
   position: absolute;
   left: 0;
   top: 0;
-  color: var(--primary-color);
+  color: var(--secondary-color);
   font-size: 1.5rem;
   opacity: 0.5;
 }
@@ -124,18 +159,25 @@
   gap: 0.5rem;
   margin-top: auto;
   padding: 0.5rem 0;
-  transition: color 0.3s ease;
+  transition: all 0.3s ease;
 }
 
 .read-more-btn:hover {
   color: var(--secondary-color);
+  transform: translateX(5px);
 }
 
 .testimony-full {
   max-height: 0;
   overflow: hidden;
-  transition: max-height 0.3s ease-out;
+  transition: all 0.3s ease-out;
   margin-top: 1.5rem;
+  opacity: 0;
+}
+
+.testimony-card.expanded .testimony-full {
+  opacity: 1;
+  margin-bottom: 1.5rem;
 }
 
 .testimony-full p {
@@ -146,10 +188,6 @@
 
 .testimony-full p:last-child {
   margin-bottom: 0;
-}
-
-.testimony-card.expanded .testimony-full {
-  margin-bottom: 1.5rem;
 }
 
 @media (max-width: 768px) {
@@ -169,10 +207,6 @@
     padding: 1rem;
   }
 
-  .testimony-card {
-    grid-template-columns: 150px 1fr;
-  }
-
   .testimony-header h3 {
     font-size: 1.5rem;
   }
@@ -187,16 +221,16 @@
     font-size: 2rem;
   }
 
-  .testimony-card {
-    grid-template-columns: 1fr;
-  }
-
-  .testimony-image {
-    height: 200px;
-  }
-
   .testimony-content {
     padding: 1.5rem;
+  }
+
+  .testimony-header {
+    gap: 1rem;
+  }
+
+  .testimony-header i {
+    font-size: 2rem;
   }
 
   .testimony-header h3 {
@@ -209,5 +243,9 @@
 
   .testimony-quote i {
     font-size: 1.25rem;
+  }
+
+  .role {
+    font-size: 0.9rem;
   }
 }

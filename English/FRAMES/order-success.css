@@ -131,6 +131,18 @@
   padding: 0.5rem;
   background: rgba(44, 74, 124, 0.1);
   border-radius: 4px;
+  border-left: 3px solid var(--primary-color);
+}
+
+.verse-reference {
+  color: var(--primary-color);
+  font-style: italic;
+  margin-top: 0.5rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+  padding-left: 1rem;
+  background: rgba(44, 74, 124, 0.05);
+  border-left: 3px solid var(--secondary-color);
 }
 
 .item-price {
@@ -257,4 +269,5 @@
   .action-buttons {
     grid-template-columns: 1fr;
   }
-}
+} 
+

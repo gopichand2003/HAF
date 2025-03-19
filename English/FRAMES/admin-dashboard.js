@@ -98,7 +98,6 @@ function setupEventListeners() {
     }
 }
 
-// New function to listen for unread messages
 function setupAdminUnreadMessagesListener() {
     const chatMetadataRef = collection(db, "chatMetadata");
     onSnapshot(chatMetadataRef, (snapshot) => {
@@ -425,7 +424,10 @@ window.viewOrderDetails = function(orderNumber) {
                     <img src="${item.image}" alt="${item.name}">
                     <div class="item-details">
                         <h4>${item.name}</h4>
-                        ${item.customText ? `<p class="custom-text">Custom Text: "${item.customText}"</p>` : ''}
+                        ${item.customText ? `
+                            <p class="custom-text">Custom Text: "${item.customText}"</p>
+                            ${item.verseReference ? `<p class="verse-reference">Reference: ${item.verseReference}</p>` : ''}
+                        ` : ''}
                         <p>Quantity: ${item.quantity}</p>
                     </div>
                     <div class="item-total">
@@ -458,9 +460,7 @@ window.closeOrderModal = function() {
     document.getElementById('orderModal').classList.remove('active');
 };
 
-// Message handling function
 function showMessage(message, isError = false) {
-    // Remove any existing message
     removeMessages();
     
     const messageDiv = document.createElement('div');
@@ -470,7 +470,6 @@ function showMessage(message, isError = false) {
         ${message}
     `;
     
-    // Find the appropriate container based on context
     let container;
     if (document.querySelector('.modal.active')) {
         container = document.querySelector('.modal.active .modal-content');
@@ -483,7 +482,6 @@ function showMessage(message, isError = false) {
     if (container) {
         container.insertAdjacentElement('afterbegin', messageDiv);
         
-        // Auto-remove message after 5 seconds
         setTimeout(() => {
             messageDiv.remove();
         }, 5000);
@@ -504,7 +502,6 @@ async function loadFrameTypes() {
             frameTypes.push({ id: doc.id, ...doc.data() });
         });
 
-        // Update frame type select options
         const materialSelect = document.getElementById('itemMaterial');
         if (materialSelect) {
             materialSelect.innerHTML = `
@@ -520,7 +517,6 @@ async function loadFrameTypes() {
     }
 }
 
-// Frame type modal functions
 window.showFrameTypeModal = function() {
     editingFrameTypeId = null;
     document.getElementById('frameTypeModalTitle').textContent = 'Add New Frame Type';
@@ -594,7 +590,6 @@ async function handleFrameTypeSubmit(e) {
     }
 }
 
-// Frame size modal functions
 window.showFrameSizeModal = function() {
     document.getElementById('frameSizeModal').classList.add('active');
     document.getElementById('frameSizeForm').reset();
@@ -624,7 +619,6 @@ window.addSizeImageUrlInput = function() {
     imageUrlInputs.appendChild(newInput);
 };
 
-// Add event listener for frame size form submission
 document.getElementById('frameSizeForm')?.addEventListener('submit', async function(e) {
     e.preventDefault();
     
@@ -647,17 +641,14 @@ document.getElementById('frameSizeForm')?.addEventListener('submit', async funct
             timestamp: Timestamp.now()
         };
 
-        // Check if size already exists
         const frameSizesRef = collection(db, "frameSizes");
         const q = query(frameSizesRef);
         const snapshot = await getDocs(q);
         const existingSize = snapshot.docs.find(doc => doc.data().size === size);
 
         if (existingSize) {
-            // Update existing size
             await updateDoc(doc(frameSizesRef, existingSize.id), frameSizeData);
         } else {
-            // Add new size
             await addDoc(frameSizesRef, frameSizeData);
         }
         

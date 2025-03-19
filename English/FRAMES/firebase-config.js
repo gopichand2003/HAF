@@ -6,7 +6,7 @@ const firebaseConfig = {
     apiKey: "AIzaSyDqfO7C2jAeFCeggWoDDwnP6Mi0KQF4xCE",
     authDomain: "haftrail.firebaseapp.com",
     projectId: "haftrail",
-    storageBucket: "haftrail.appspot.com",
+    storageBucket: "haftrail.firebasestorage.app",
     messagingSenderId: "308714739048",
     appId: "1:308714739048:web:ec3732457c4fac96f372dd"
 };

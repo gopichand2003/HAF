@@ -430,9 +430,12 @@ async function processCODOrder(order, userRef, userData, singleItemId) {
 }
 
 async function processOnlinePayment(order, userRef, userData, singleItemId) {
+  // Get Razorpay API key from environment variables
+  // const razorpayKey = import.meta.env.VITE_RAZORPAY_KEY;
+
   const options = {
-    key: "rzp_test_9XbJPu0vOzevBn",
-    amount: Math.round(order.total * 100),
+    key: "rzp_test_wg3mWWNei4rNLb", // Your test key (replace with live key in production)
+    amount: Math.round(order.total * 100), // Amount in paise
     currency: "INR",
     name: "Holy Army Fellowship",
     description: "Frame Purchase",
@@ -444,6 +447,14 @@ async function processOnlinePayment(order, userRef, userData, singleItemId) {
     notes: {
       orderId: order.orderNumber,
       userId: userData.id
+    },
+    // Restrict payment methods to UPI, Netbanking, and Cards only
+    method: {
+      upi: true,        // Enable UPI
+      netbanking: true, // Enable Netbanking
+      card: true,       // Enable Cards
+      wallet: false,    // Disable Wallet
+      paylater: false   // Disable PayLater
     },
     handler: async function(response) {
       try {
@@ -520,7 +531,7 @@ async function processOnlinePayment(order, userRef, userData, singleItemId) {
     showMessage(`Payment failed: ${response.error.description}`, true);
     setButtonLoading(document.querySelector('.place-order-btn'), false);
   });
-  
+
   rzp.open();
 }
 

@@ -56,7 +56,16 @@
           <div class="frame-display">
             <div class="frame-content">
               <div class="verse-display">
-                <p id="customText" class="verse-text"></p>
+                <p class="verse-text" id="verse-text">Please select a Bible verse to display.</p>
+                <p class="verse-reference" id="verse-reference"></p>
+                
+                <!-- Add disclaimer messages -->
+                <div id="english-disclaimer" class="disclaimer">
+                  <strong>Note:</strong> The displayed verse may have slight variations from your physical Bible. Please use the verse reference to verify the exact wording in your Bible.
+                </div>
+                <div id="telugu-disclaimer" class="disclaimer">
+                  <strong>గమనిక:</strong> ప్రదర్శించబడిన వచనం మీ భౌతిక బైబిల్‌లోని వచనం నుండి కొద్దిగా మార్పులు కలిగి ఉండవచ్చు. దయచేసి ఖచ్చితమైన పదజాలం కోసం మీ బైబిల్‌లో వచన సూచికను ఉపయోగించి సరిచూసుకోండి.
+                </div>
               </div>
             </div>
           </div>
@@ -66,11 +75,55 @@
         </div>
 
         <div class="verse-selection">
-          <div class="text-input-container">
+          <!-- Text Type Selection -->
+          <div class="text-type-selector">
+            <button class="type-btn active" data-type="custom">
+              <i class="fas fa-pen"></i>
+              Custom Text
+            </button>
+            <button class="type-btn" data-type="bible">
+              <i class="fas fa-bible"></i>
+              Bible Verse
+            </button>
+          </div>
+
+          <!-- Custom Text Input -->
+          <div id="customTextSection" class="text-input-container">
             <div class="form-group">
               <label for="frameText">Enter Your Text</label>
               <textarea id="frameText" rows="5" placeholder="Enter the text you want on your frame..." required></textarea>
             </div>
+          </div>
+
+          <!-- Bible Verse Selection -->
+          <div id="bibleVerseSection" class="text-input-container" style="display: none;">
+            <div class="language-toggle">
+              <button class="language-btn active" data-lang="en_us">English</button>
+              <button class="language-btn" data-lang="tel">Telugu</button>
+            </div>
+
+            <div class="selector-group">
+              <label for="book-select">Select Book:</label>
+              <select id="book-select">
+                <option value="">-- Select Book --</option>
+              </select>
+              
+              <label for="chapter-select">Select Chapter:</label>
+              <select id="chapter-select" disabled>
+                <option value="">-- Select Chapter --</option>
+              </select>
+              
+              <label for="verse-select">Select Verse:</label>
+              <select id="verse-select" disabled>
+                <option value="">-- Select Verse --</option>
+              </select>
+            </div>
+
+            <div id="loading-indicator" class="loading" style="display: none;">
+              <div class="loading-spinner"></div>
+              <p>Loading verse...</p>
+            </div>
+            <div id="error-message" class="error-message" style="display: none;"></div>
           </div>
 
           <div class="size-selector">

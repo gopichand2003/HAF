@@ -1581,3 +1581,26 @@
 .floating-unread-indicator:hover {
   transform: scale(1.1);
 }
+
+.verse-reference {
+  color: var(--primary-color);
+  font-style: italic;
+  margin-top: 0.5rem;
+  margin-left: 10px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  padding-left: 1rem;
+  background: rgba(44, 74, 124, 0.05);
+  border-left: 3px solid var(--secondary-color);
+}
+
+.custom-text {
+  color: var(--text-color);
+  font-style: italic;
+  margin: 0.5rem 0;
+  margin-left: 10px;
+  padding: 0.75rem;
+  background: rgba(44, 74, 124, 0.05);
+  border-radius: 4px;
+  border-left: 3px solid var(--primary-color);
+}
