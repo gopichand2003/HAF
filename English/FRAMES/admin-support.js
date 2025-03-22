@@ -475,15 +475,21 @@ async function handleSendMessage(e) {
   }
   
   const messageInput = document.getElementById('adminMessageInput');
+  const sendButton = document.getElementById('adminSendButton');
   const message = messageInput.value.trim();
   
-  if (!message && attachments.length === 0) return;
+  if ((!message && attachments.length === 0) || sendButton.disabled) return;
+
+  // Disable send button and clear input immediately
+  sendButton.disabled = true;
+  const originalMessage = message;
+  messageInput.value = '';
   
   try {
     const messageId = Date.now().toString();
     const messageObj = {
       id: messageId,
-      text: message,
+      text: originalMessage,
       sender: 'admin',
       timestamp: Timestamp.now(),
       readByUser: false
@@ -512,15 +518,13 @@ async function handleSendMessage(e) {
       await updateDoc(chatMetadataRef, {
         lastActive: Timestamp.now(),
         lastMessage: {
-          text: message || 'Attachment',
+          text: originalMessage || 'Attachment',
           timestamp: Timestamp.now(),
           sender: 'admin'
         },
         userUnreadCount: (userData.userUnreadCount || 0) + 1
       });
       
-      // Clear input and attachments
-      messageInput.value = '';
       clearAttachments();
       
       // Stop typing indicator
@@ -529,8 +533,31 @@ async function handleSendMessage(e) {
   } catch (error) {
     console.error("Error sending message:", error);
     alert('Failed to send message. Please try again.');
+    // If there's an error, restore the message
+    messageInput.value = originalMessage;
+  } finally {
+    // Re-enable send button
+    sendButton.disabled = false;
   }
 }
+
+// Add Enter key handling for admin chat
+document.addEventListener('DOMContentLoaded', () => {
+  const messageInput = document.getElementById('adminMessageInput');
+  const sendButton = document.getElementById('adminSendButton');
+  const chatForm = document.getElementById('adminChatForm');
+
+  if (messageInput && chatForm) {
+    messageInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        if (!sendButton.disabled) {
+          chatForm.dispatchEvent(new Event('submit'));
+        }
+      }
+    });
+  }
+});
 
 function setupFileUpload() {
   const fileInput = document.getElementById('adminFileAttachment');

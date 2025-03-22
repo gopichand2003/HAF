@@ -347,6 +347,7 @@ html[lang='hi'] .site-title h1 {
   transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
   z-index: 1001;
   box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
+  overflow-y: auto
 }
 
 header.transparent .main-nav {
@@ -398,6 +399,7 @@ header.transparent .main-nav {
   flex-direction: column;
   gap: 0.5rem;
   padding: 1rem;
+  padding-bottom: 5rem;
 }
 
 .nav-links a,

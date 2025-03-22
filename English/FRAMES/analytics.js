@@ -2,6 +2,8 @@ import { db, auth } from './firebase-config.js';
 import { collection, getDocs } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-firestore.js";
 import { signOut } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-auth.js";
 
+let usersData = [];
+
 document.addEventListener('DOMContentLoaded', () => {
     // Check admin authentication
     if (!sessionStorage.getItem('adminLoggedIn')) {
@@ -56,7 +58,7 @@ async function loadAnalytics() {
     try {
         const usersRef = collection(db, "users");
         const usersSnapshot = await getDocs(usersRef);
-        const users = [];
+        usersData = [];
         let totalOrders = 0;
         let totalRevenue = 0;
         let activeUsers = 0;
@@ -68,7 +70,7 @@ async function loadAnalytics() {
                 const userOrders = userData.orders || [];
                 const userRevenue = userOrders.reduce((sum, order) => sum + order.total, 0);
                 
-                users.push({
+                usersData.push({
                     id: doc.id,
                     name: `${userData.firstName} ${userData.lastName}`,
                     email: userData.email,
@@ -86,47 +88,30 @@ async function loadAnalytics() {
         });
 
         // Update statistics
-        document.getElementById('totalUsers').textContent = users.length;
+        document.getElementById('totalUsers').textContent = usersData.length;
         document.getElementById('activeUsers').textContent = activeUsers;
         document.getElementById('totalOrders').textContent = totalOrders;
         document.getElementById('totalRevenue').textContent = `₹${totalRevenue.toLocaleString()}`;
 
         // Sort users by name
-        users.sort((a, b) => a.name.localeCompare(b.name));
+        usersData.sort((a, b) => a.name.localeCompare(b.name));
 
         // Update users table
         const usersTableBody = document.querySelector('#usersTable tbody');
         if (usersTableBody) {
-            usersTableBody.innerHTML = users.map(user => `
+            usersTableBody.innerHTML = usersData.map(user => `
                 <tr>
                     <td>${user.name}</td>
                     <td>${user.email}</td>
                     <td>${user.phone}</td>
                     <td>${user.orderCount}</td>
-                </tr>
-            `).join('');
-        }
-
-        // Update orders table
-        const ordersTableBody = document.querySelector('#ordersTable tbody');
-        if (ordersTableBody) {
-            const allOrders = users.flatMap(user => 
-                user.orders.map(order => ({
-                    ...order,
-                    customerName: user.name,
-                    customerEmail: user.email
-                }))
-            );
-
-            allOrders.sort((a, b) => new Date(b.date) - new Date(a.date));
-
-            ordersTableBody.innerHTML = allOrders.map(order => `
-                <tr>
-                    <td>${order.orderNumber}</td>
-                    <td>${order.customerName}</td>
-                    <td>${new Date(order.date).toLocaleDateString('en-IN')}</td>
-                    <td><span class="order-status status-${order.status.toLowerCase()}">${order.status}</span></td>
-                    <td>₹${order.total.toLocaleString()}</td>
+                    <td>
+                        ${user.orderCount > 0 ? `
+                            <button class="view-orders-btn" onclick="showUserOrders('${user.id}')">
+                                <i class="fas fa-eye"></i> View Orders
+                            </button>
+                        ` : '-'}
+                    </td>
                 </tr>
             `).join('');
         }
@@ -143,8 +128,39 @@ function exportToExcel() {
     const usersWS = XLSX.utils.table_to_sheet(document.getElementById('usersTable'));
     XLSX.utils.book_append_sheet(wb, usersWS, "Users");
     
-    const ordersWS = XLSX.utils.table_to_sheet(document.getElementById('ordersTable'));
-    XLSX.utils.book_append_sheet(wb, ordersWS, "Orders");
+    if (document.getElementById('userOrdersSection').style.display !== 'none') {
+        const ordersWS = XLSX.utils.table_to_sheet(document.getElementById('userOrdersTable'));
+        XLSX.utils.book_append_sheet(wb, ordersWS, "Selected User Orders");
+    }
     
     XLSX.writeFile(wb, "HAF_Analytics.xlsx");
 }
+
+// Make these functions global so they can be called from HTML
+window.showUserOrders = function(userId) {
+    const user = usersData.find(u => u.id === userId);
+    if (!user) return;
+
+    document.getElementById('selectedUserName').textContent = user.name;
+    
+    const userOrdersTableBody = document.querySelector('#userOrdersTable tbody');
+    if (userOrdersTableBody) {
+        userOrdersTableBody.innerHTML = user.orders
+            .sort((a, b) => new Date(b.date) - new Date(a.date))
+            .map(order => `
+                <tr>
+                    <td>${order.orderNumber}</td>
+                    <td>${new Date(order.date).toLocaleDateString('en-IN')}</td>
+                    <td><span class="order-status status-${order.status.toLowerCase()}">${order.status}</span></td>
+                    <td><span class="shipping-status ${order.shipped ? 'shipped' : 'pending'}">${order.shipped ? 'Shipped' : 'Pending'}</span></td>
+                    <td>₹${order.total.toLocaleString()}</td>
+                </tr>
+            `).join('');
+    }
+
+    document.getElementById('userOrdersSection').style.display = 'block';
+};
+
+window.hideUserOrders = function() {
+    document.getElementById('userOrdersSection').style.display = 'none';
+};

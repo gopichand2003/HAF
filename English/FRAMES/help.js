@@ -236,23 +236,40 @@ function renderMessages(messages) {
 function setupChatForm() {
   const chatForm = document.getElementById('chatForm');
   const messageInput = document.getElementById('messageInput');
+  const sendButton = document.getElementById('sendButton');
+  
   if (!chatForm || !messageInput) return;
 
   messageInput.addEventListener('input', () => {
-    // Notify admin that user is typing
     updateTypingStatus(true);
+  });
+
+  // Handle Enter key press
+  messageInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      if (!sendButton.disabled) {
+        chatForm.dispatchEvent(new Event('submit'));
+      }
+    }
   });
 
   chatForm.addEventListener('submit', async (e) => {
     e.preventDefault();
+    
     const message = messageInput.value.trim();
-    if (!message && attachments.length === 0) return;
+    if ((!message && attachments.length === 0) || sendButton.disabled) return;
 
+    // Disable send button and clear input immediately
+    sendButton.disabled = true;
+    const originalMessage = message;
+    messageInput.value = '';
+    
     try {
       const messageId = Date.now().toString();
       const messageObj = {
         id: messageId,
-        text: message,
+        text: originalMessage,
         sender: 'user',
         timestamp: Timestamp.now(),
         userName: `${currentUser.firstName || ''} ${currentUser.lastName || ''}`.trim() || 'Unknown User',
@@ -261,22 +278,24 @@ function setupChatForm() {
         deliveredToAdmin: false
       };
 
-      if (attachments.length > 0) messageObj.attachment = attachments[0];
+      if (attachments.length > 0) {
+        messageObj.attachment = attachments[0];
+      }
 
       const userRef = doc(db, "users", currentUser.id);
       const userDoc = await getDoc(userRef);
       if (!userDoc.exists()) throw new Error("User document missing");
 
-      await updateDoc(userRef, { chat: arrayUnion(messageObj) }).catch(async (error) => {
-        if (error.code === 'failed-precondition') {
-          await setDoc(userRef, { chat: [messageObj] }, { merge: true });
-        } else throw error;
-      });
+      await updateDoc(userRef, { chat: arrayUnion(messageObj) });
 
       const chatMetadataRef = doc(db, "chatMetadata", currentUser.id);
       const metadataUpdate = {
         lastActive: Timestamp.now(),
-        lastMessage: { text: message || 'Attachment', timestamp: Timestamp.now(), sender: 'user' }
+        lastMessage: { 
+          text: originalMessage || 'Attachment', 
+          timestamp: Timestamp.now(), 
+          sender: 'user' 
+        }
       };
 
       const metadataDoc = await getDoc(chatMetadataRef);
@@ -292,7 +311,6 @@ function setupChatForm() {
           ...metadataUpdate
         });
       } else {
-        // Increment unread count for admin
         const currentUnreadCount = metadataDoc.data().unreadCount || 0;
         await updateDoc(chatMetadataRef, {
           ...metadataUpdate,
@@ -322,11 +340,15 @@ function setupChatForm() {
         } else throw error;
       });
 
-      messageInput.value = '';
       clearAttachments();
     } catch (error) {
       console.error('Error sending message:', error);
       showErrorMessage(`Failed to send message: ${error.message}`);
+      // If there's an error, restore the message
+      messageInput.value = originalMessage;
+    } finally {
+      // Re-enable send button
+      sendButton.disabled = false;
     }
   });
 }

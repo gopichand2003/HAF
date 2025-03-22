@@ -434,7 +434,8 @@ async function processOnlinePayment(order, userRef, userData, singleItemId) {
   // const razorpayKey = import.meta.env.VITE_RAZORPAY_KEY;
 
   const options = {
-    key: "rzp_test_wg3mWWNei4rNLb", // Your test key (replace with live key in production)
+    // key: "rzp_test_wg3mWWNei4rNLb", // Your test key (replace with live key in production)
+    key: "rzp_live_JQNsDDkbObpbWP",
     amount: Math.round(order.total * 100), // Amount in paise
     currency: "INR",
     name: "Holy Army Fellowship",
