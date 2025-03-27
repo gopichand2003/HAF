@@ -5,6 +5,50 @@ let currentUser = null;
 let editingAddressId = null;
 let unsubscribe = null;
 
+// Add custom dialog HTML to the document
+document.body.insertAdjacentHTML('beforeend', `
+  <div class="custom-dialog" id="customDialog">
+    <div class="dialog-content">
+      <i class="dialog-icon fas"></i>
+      <h3 class="dialog-title"></h3>
+      <p class="dialog-message"></p>
+      <div class="dialog-buttons"></div>
+    </div>
+  </div>
+`);
+
+// Custom dialog function
+function showCustomDialog({ title, message, icon, buttons }) {
+  const dialog = document.getElementById('customDialog');
+  const dialogIcon = dialog.querySelector('.dialog-icon');
+  const dialogTitle = dialog.querySelector('.dialog-title');
+  const dialogMessage = dialog.querySelector('.dialog-message');
+  const dialogButtons = dialog.querySelector('.dialog-buttons');
+
+  dialogIcon.className = `dialog-icon fas ${icon}`;
+  dialogTitle.textContent = title;
+  dialogMessage.textContent = message;
+  
+  dialogButtons.innerHTML = buttons.map(btn => `
+    <button class="dialog-btn ${btn.class}" data-action="${btn.action}">
+      ${btn.text}
+    </button>
+  `).join('');
+
+  dialog.classList.add('active');
+
+  // Handle button clicks
+  dialogButtons.addEventListener('click', function(e) {
+    if (e.target.classList.contains('dialog-btn')) {
+      const action = e.target.dataset.action;
+      dialog.classList.remove('active');
+      if (typeof buttons.find(btn => btn.action === action).onClick === 'function') {
+        buttons.find(btn => btn.action === action).onClick();
+      }
+    }
+  });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     if (!window.auth.checkAuth()) return;
     
@@ -132,41 +176,113 @@ function loadOrders(orders) {
     // Sort orders by date (most recent first)
     const sortedOrders = [...orders].sort((a, b) => new Date(b.date) - new Date(a.date));
     
-    ordersList.innerHTML = sortedOrders.map(order => `
-        <div class="order-card">
-            <div class="order-header">
-                <span class="order-id">Order #${order.id}</span>
-                <span class="order-date">${new Date(order.date).toLocaleDateString('en-IN', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                })}</span>
-                <span class="order-status">${order.status}</span>
-                <a href="order-success.html?orderId=${order.id}" class="download-invoice-btn">
-                    <i class="fas fa-download"></i> Download Invoice
-                </a>
-            </div>
-            <div class="order-items">
-                ${order.items.map(item => `
-                    <div class="order-item">
-                        <img src="${item.image}" alt="${item.name}">
-                        <div class="item-details">
-                            <h4>${item.name}</h4>
-                            <p>Quantity: ${item.quantity}</p>
+    ordersList.innerHTML = sortedOrders.map(order => {
+        const orderDate = new Date(order.date);
+        const now = new Date();
+        const hoursSinceOrder = (now - orderDate) / (1000 * 60 * 60);
+        const canCancel = hoursSinceOrder <= 24 && order.status === 'Confirmed' && !order.shipped;
+
+        return `
+            <div class="order-card">
+                <div class="order-header">
+                    <span class="order-id">Order #${order.orderNumber}</span>
+                    <span class="order-date">${orderDate.toLocaleDateString('en-IN', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    })}</span>
+                    <span class="order-status ${order.status.toLowerCase()}">${order.status}</span>
+                    ${canCancel ? `
+                        <button class="cancel-order-btn" onclick="cancelOrder('${order.orderNumber}')">
+                            <i class="fas fa-times"></i> Cancel Order
+                        </button>
+                    ` : ''}
+                    <a href="order-success.html?orderId=${order.orderNumber}" class="download-invoice-btn">
+                        <i class="fas fa-download"></i> Download Invoice
+                    </a>
+                </div>
+                <div class="order-items">
+                    ${order.items.map(item => `
+                        <div class="order-item">
+                            <img src="${item.image}" alt="${item.name}">
+                            <div class="item-details">
+                                <h4>${item.name}</h4>
+                                <p>Quantity: ${item.quantity}</p>
+                            </div>
+                            <div class="item-price">
+                                ₹${(item.price * item.quantity).toLocaleString()}
+                            </div>
                         </div>
-                        <div class="item-price">
-                            ₹${(item.price * item.quantity).toLocaleString()}
-                        </div>
-                    </div>
-                `).join('')}
+                    `).join('')}
+                </div>
+                <div class="order-total">
+                    Total: ₹${order.total.toLocaleString()}
+                </div>
             </div>
-            <div class="order-total">
-                Total: ₹${order.total.toLocaleString()}
-            </div>
-        </div>
-    `).join('');
+        `;
+    }).join('');
+}
+
+// Update the cancelOrder function
+window.cancelOrder = function(orderNumber) {
+  showCustomDialog({
+    title: 'Cancel Order',
+    message: 'Are you sure you want to cancel this order?',
+    icon: 'fa-exclamation-circle',
+    buttons: [
+      {
+        text: 'No, Keep Order',
+        class: 'dialog-btn-cancel',
+        action: 'cancel',
+        onClick: () => {}
+      },
+      {
+        text: 'Yes, Cancel Order',
+        class: 'dialog-btn-confirm',
+        action: 'confirm',
+        onClick: async () => {
+          try {
+            const userRef = doc(db, "users", currentUser.id);
+            const userDoc = await getDoc(userRef);
+            
+            if (userDoc.exists()) {
+              const userData = userDoc.data();
+              const orders = userData.orders || [];
+              
+              const updatedOrders = orders.map(order => {
+                if (order.orderNumber === orderNumber) {
+                  return { ...order, status: 'Cancelled' };
+                }
+                return order;
+              });
+              
+              await updateDoc(userRef, { orders: updatedOrders });
+              showMessage('Order cancelled successfully', true);
+            }
+          } catch (error) {
+            console.error("Error cancelling order:", error);
+            showMessage('Failed to cancel order', false);
+          }
+        }
+      }
+    ]
+  });
+};
+
+function showMessage(message, isSuccess) {
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `message-popup ${isSuccess ? 'success' : 'error'}`;
+    messageDiv.innerHTML = `
+        <i class="fas ${isSuccess ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i>
+        ${message}
+    `;
+    document.body.appendChild(messageDiv);
+    
+    setTimeout(() => {
+        messageDiv.remove();
+    }, 3000);
 }
 
 function updateCartCount(cart) {
@@ -296,27 +412,47 @@ window.editAddress = async function(addressId) {
     }
 };
 
-window.deleteAddress = async function(addressId) {
-    if (!confirm('Are you sure you want to delete this address?')) return;
-    
-    try {
-        const userRef = doc(db, "users", currentUser.id);
-        const userDoc = await getDoc(userRef);
-        let addresses = userDoc.data().addresses || [];
-        
-        const addressToDelete = addresses.find(addr => addr.id === addressId);
-        addresses = addresses.filter(addr => addr.id !== addressId);
-        
-        // If we deleted the default address, make the first remaining address default
-        if (addressToDelete.isDefault && addresses.length > 0) {
-            addresses[0].isDefault = true;
+// Update the deleteAddress function
+window.deleteAddress = function(addressId) {
+  showCustomDialog({
+    title: 'Delete Address',
+    message: 'Are you sure you want to delete this address?',
+    icon: 'fa-trash-alt',
+    buttons: [
+      {
+        text: 'Cancel',
+        class: 'dialog-btn-cancel',
+        action: 'cancel',
+        onClick: () => {}
+      },
+      {
+        text: 'Delete',
+        class: 'dialog-btn-delete',
+        action: 'delete',
+        onClick: async () => {
+          try {
+            const userRef = doc(db, "users", currentUser.id);
+            const userDoc = await getDoc(userRef);
+            let addresses = userDoc.data().addresses || [];
+            
+            const addressToDelete = addresses.find(addr => addr.id === addressId);
+            addresses = addresses.filter(addr => addr.id !== addressId);
+            
+            if (addressToDelete.isDefault && addresses.length > 0) {
+              addresses[0].isDefault = true;
+            }
+            
+            await updateDoc(userRef, { addresses });
+            loadAddresses(addresses);
+            showMessage('Address deleted successfully', true);
+          } catch (error) {
+            console.error("Error deleting address:", error);
+            showMessage('Failed to delete address', false);
+          }
         }
-        
-        await updateDoc(userRef, { addresses });
-        loadAddresses(addresses);
-    } catch (error) {
-        console.error("Error deleting address:", error);
-    }
+      }
+    ]
+  });
 };
 
 window.setDefaultAddress = async function(addressId) {

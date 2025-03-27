@@ -496,3 +496,13 @@ footer {
     font-size: 0.9rem;
   }
 }
+
+.footer-section a {
+  color: white;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.footer-section a:hover {
+  color: var(--secondary-color);
+}

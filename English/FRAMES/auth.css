@@ -2,7 +2,12 @@
 :root {
   --auth-primary: #2c4a7c;
   --auth-secondary: #ffc107;
-  --auth-gradient: linear-gradient(135deg, #1a1f3c 0%, #2c4a7c 50%, #1a1f3c 100%);
+  --auth-gradient: linear-gradient(
+    135deg,
+    #1a1f3c 0%,
+    #2c4a7c 50%,
+    #1a1f3c 100%
+  );
   --auth-error: #dc3545;
   --auth-success: #28a745;
 }
@@ -14,7 +19,10 @@
   justify-content: center;
   padding: 2rem;
   margin-top: 120px;
-  background: linear-gradient(rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.9));
+  background: linear-gradient(
+    rgba(255, 255, 255, 0.9),
+    rgba(255, 255, 255, 0.9)
+  );
 }
 
 .auth-card {
@@ -99,6 +107,39 @@
   font-weight: 600;
 }
 
+/* Terms Checkbox Styles */
+.terms-checkbox {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin: 0.5rem 0;
+}
+
+.terms-checkbox input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  margin-top: 0.25rem;
+  accent-color: var(--auth-primary);
+  cursor: pointer;
+}
+
+.terms-checkbox label {
+  font-size: 0.9rem;
+  color: #666;
+  line-height: 1.4;
+}
+
+.terms-checkbox a {
+  color: var(--auth-primary);
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.3s ease;
+}
+
+.terms-checkbox a:hover {
+  color: var(--auth-secondary);
+}
+
 /* Password visibility toggle */
 .password-toggle {
   position: absolute;
@@ -139,7 +180,12 @@
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
   transition: all 0.5s ease;
 }
 
@@ -287,9 +333,16 @@
 }
 
 @keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  25% { transform: translateX(-5px); }
-  75% { transform: translateX(5px); }
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-5px);
+  }
+  75% {
+    transform: translateX(5px);
+  }
 }
 
 @media (max-width: 768px) {

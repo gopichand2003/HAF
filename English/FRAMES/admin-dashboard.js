@@ -306,7 +306,7 @@ function filterOrders() {
     // Apply shipping status filter
     if (currentFilter !== 'all') {
         filteredOrders = filteredOrders.filter(order => {
-            if (currentFilter === 'pending') return !order.shipped;
+            if (currentFilter === 'pending') return !order.shipped && order.status !== 'Cancelled';
             if (currentFilter === 'shipped') return order.shipped;
             return true;
         });
@@ -335,7 +335,7 @@ function filterOrders() {
                     <span class="shipping-status ${order.shipped ? 'shipped' : 'pending'}">
                         ${order.shipped ? 'Shipped' : 'Pending'}
                     </span>
-                    ${!order.shipped ? `
+                    ${!order.shipped && order.status !== 'Cancelled' ? `
                         <button class="ship-btn" onclick="markAsShipped('${order.userId}', '${order.orderNumber}')">
                             Mark as Shipped
                         </button>

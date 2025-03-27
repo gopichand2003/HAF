@@ -382,6 +382,7 @@
   border-radius: 8px;
   overflow: hidden;
   border: 1px solid #e2e8f0;
+  margin-bottom: 1.5rem;
 }
 
 .order-header {
@@ -390,6 +391,8 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
 }
 
 .order-id {
@@ -402,11 +405,45 @@
 }
 
 .order-status {
-  background: #10b981;
-  color: white;
   padding: 0.25rem 0.75rem;
   border-radius: 9999px;
   font-size: 0.875rem;
+  font-weight: 500;
+  text-transform: capitalize;
+}
+
+.order-status.confirmed {
+  background: #10b981;
+  color: white;
+}
+
+.order-status.cancelled {
+  background: #ef4444;
+  color: white;
+}
+
+.order-status.shipped {
+  background: #3b82f6;
+  color: white;
+}
+
+.cancel-order-btn {
+  padding: 0.5rem 1rem;
+  background: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.3s ease;
+}
+
+.cancel-order-btn:hover {
+  background: #dc2626;
+  transform: translateY(-1px);
 }
 
 .order-items {
@@ -456,6 +493,54 @@
   color: var(--primary-color);
 }
 
+/* Message Popup Styles */
+.message-popup {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  padding: 1rem 2rem;
+  border-radius: 8px;
+  color: white;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  animation: slideIn 0.3s ease-out, fadeOut 0.3s ease-out 2.7s forwards;
+  z-index: 1000;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.message-popup.success {
+  background: #10b981;
+}
+
+.message-popup.error {
+  background: #ef4444;
+}
+
+.message-popup i {
+  font-size: 1.2rem;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
 @media (max-width: 768px) {
   .profile-page {
     padding: 1rem;
@@ -502,43 +587,140 @@
     text-align: left;
     margin-top: 0.5rem;
   }
+
+  .cancel-order-btn,
+  .download-invoice-btn {
+    width: 100%;
+    justify-content: center;
+  }
 }
 
 .download-invoice-btn {
-    background: var(--primary-color);
-    color: white;
-    padding: 0.5rem 1rem;
-    border-radius: 4px;
-    text-decoration: none;
-    font-size: 0.9rem;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    transition: all 0.3s ease;
-    margin-left: 1rem;
+  background: var(--primary-color);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  text-decoration: none;
+  font-size: 0.9rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.3s ease;
+  margin-left: 1rem;
 }
 
 .download-invoice-btn:hover {
-    background: var(--secondary-color);
-    transform: translateY(-1px);
+  background: var(--secondary-color);
+  transform: translateY(-1px);
 }
 
 .download-invoice-btn i {
-    font-size: 1rem;
+  font-size: 1rem;
 }
 
-@media (max-width: 768px) {
-    .order-header {
-        flex-wrap: wrap;
-        gap: 0.5rem;
-    }
+/* Custom Dialog Styles */
+.custom-dialog {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1100;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.3s ease-out;
+}
 
-    .download-invoice-btn {
-        width: 100%;
-        justify-content: center;
-        margin-left: 0;
-        margin-top: 0.5rem;
-    }
+.custom-dialog.active {
+  display: flex;
+}
+
+.dialog-content {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 400px;
+  text-align: center;
+  animation: slideUp 0.3s ease-out;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.dialog-icon {
+  font-size: 3rem;
+  color: var(--primary-color);
+  margin-bottom: 1rem;
+}
+
+.dialog-title {
+  color: var(--primary-color);
+  font-family: 'Cinzel', serif;
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.dialog-message {
+  color: #64748b;
+  margin-bottom: 2rem;
+  line-height: 1.6;
+}
+
+.dialog-buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.dialog-btn {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: 'Cinzel', serif;
+  transition: all 0.3s ease;
+  min-width: 120px;
+}
+
+.dialog-btn-cancel {
+  background: #e2e8f0;
+  color: #4a5568;
+}
+
+.dialog-btn-confirm {
+  background: var(--primary-color);
+  color: white;
+}
+
+.dialog-btn-delete {
+  background: #ef4444;
+  color: white;
+}
+
+.dialog-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .phone-number-container {
@@ -552,37 +734,36 @@
   background: var(--primary-color);
   color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: 6px;
   cursor: pointer;
-  font-size: 0.9rem;
+  font-size: 0.875rem;
   display: flex;
   align-items: center;
   gap: 0.5rem;
   transition: all 0.3s ease;
+  font-family: 'Cinzel', serif;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .edit-phone-btn:hover {
   background: var(--secondary-color);
-  transform: translateY(-1px);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
 }
 
-/* Phone prompt message styles */
-.phone-prompt-message {
-  background-color: #f8d7da;
-  color: #721c24;
-  padding: 1rem;
-  border-radius: 4px;
-  margin-bottom: 1.5rem;
-  text-align: center;
-  font-weight: 500;
+.edit-phone-btn i {
+  font-size: 0.875rem;
 }
 
-.phone-success-message {
-  background-color: #d4edda;
-  color: #155724;
-  padding: 1rem;
-  border-radius: 4px;
-  margin-bottom: 1.5rem;
-  text-align: center;
-  font-weight: 500;
+@media (max-width: 768px) {
+  .phone-number-container {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .edit-phone-btn {
+    width: 100%;
+    justify-content: center;
+  }
 }
