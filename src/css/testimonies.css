@@ -190,6 +190,45 @@
   margin-bottom: 0;
 }
 
+/* Search Bar Styles */
+.search-container {
+  max-width: 600px;
+  margin: 2rem auto;
+  padding: 0 2rem;
+}
+
+.search-bar {
+  width: 100%;
+  padding: 1rem;
+  font-size: 1.1rem;
+  border: 2px solid rgba(44, 74, 124, 0.2);
+  border-radius: 8px;
+  background-color: white;
+  transition: all 0.3s ease;
+}
+
+.search-bar:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 10px rgba(44, 74, 124, 0.1);
+}
+
+.no-results {
+  text-align: center;
+  padding: 2rem;
+  color: #666;
+  font-size: 1.1rem;
+  display: none;
+}
+
+.testimony-card {
+  transition: all 0.3s ease;
+}
+
+.testimony-card.hidden {
+  display: none;
+}
+
 @media (max-width: 768px) {
   .testimonies-main {
     padding-top: 7rem;
@@ -213,6 +252,15 @@
 
   .testimony-quote p {
     font-size: 1rem;
+  }
+
+  .search-container {
+    padding: 0 1rem;
+  }
+  
+  .search-bar {
+    font-size: 1rem;
+    padding: 0.8rem;
   }
 }
 
