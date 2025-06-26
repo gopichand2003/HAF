@@ -83,104 +83,33 @@
       <section class="gallery-hero">
         <div class="gallery-hero-content">
           <h1>మా ప్రయాణం చిత్రాలలో</h1>
-          <p>ఆరాధన, సహవాసం మరియు సేవ క్షణాలను చిత్రీకరించడం</p>
-        </div>
+          <p>ఆరాధన, సహవాసం మరియు సేవ క్షణాలను చిత్రీకరించడంవిశ్వాసం, సహవాసం మరియు దైవిక ఆశీర్వాదాల యొక్క విలువైన క్షణాలను సంగ్రహించడం</p>
+          </div>
       </section>
 
-      <section class="gallery-filters">
-        <button class="filter-btn active" data-filter="all">అన్నీ</button>
-        <button class="filter-btn" data-filter="worship">ఆరాధన</button>
-        <button class="filter-btn" data-filter="events">కార్యక్రమాలు</button>
-        <button class="filter-btn" data-filter="community">సమాజం</button>
-      </section>
-
-      <section class="gallery-grid">
-        <!-- Worship Images -->
-        <div class="gallery-item" data-category="worship">
-          <img src="https://images.unsplash.com/photo-1438232992991-995b7058bbb3?auto=format&fit=crop&q=80" alt="ఆదివారపు ఆరాధన సేవ">
-          <div class="gallery-overlay">
-            <h3>ఆదివారపు ఆరాధన సేవ</h3>
-            <p>మా ఆదివారపు సేవలో స్తుతి మరియు ఆరాధన క్షణం</p>
-            <button class="view-btn" onclick="openLightbox(this)">
-              <i class="fas fa-expand"></i>
-              చూడండి
-            </button>
+      <section class="gallery-content">
+        <div class="slideshow-container">
+          <div class="slides-3d-container">
+            <!-- Slides will be added by JavaScript -->
           </div>
-        </div>
-
-        <div class="gallery-item" data-category="worship">
-          <img src="https://images.unsplash.com/photo-1507692049790-de58290a4334?auto=format&fit=crop&q=80" alt="ప్రార్థన సమావేశం">
-          <div class="gallery-overlay">
-            <h3>ప్రార్థన సమావేశం</h3>
-            <p>వారపు సమావేశంలో ప్రార్థనలో ఐక్యత</p>
-            <button class="view-btn" onclick="openLightbox(this)">
-              <i class="fas fa-expand"></i>
-              చూడండి
-            </button>
+          <div class="prev-arrow nav-arrow" tabindex="0" role="button" aria-label="Previous image">
+            <i class="fas fa-chevron-left"></i>
           </div>
-        </div>
-
-        <!-- Events Images -->
-        <div class="gallery-item" data-category="events">
-          <img src="https://images.unsplash.com/photo-1511632765486-a01980e01a18?auto=format&fit=crop&q=80" alt="క్రిస్మస్ వేడుక">
-          <div class="gallery-overlay">
-            <h3>క్రిస్మస్ వేడుక</h3>
-            <p>మన రక్షకుని జననాన్ని జరుపుకోవడం</p>
-            <button class="view-btn" onclick="openLightbox(this)">
-              <i class="fas fa-expand"></i>
-              చూడండి
-            </button>
+          <div class="next-arrow nav-arrow" tabindex="0" role="button" aria-label="Next image">
+            <i class="fas fa-chevron-right"></i>
           </div>
-        </div>
-
-        <div class="gallery-item" data-category="events">
-          <img src="https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&q=80" alt="యువత సదస్సు">
-          <div class="gallery-overlay">
-            <h3>యువత సదస్సు</h3>
-            <p>తదుపరి తరానికి శక్తినివ్వడం</p>
-            <button class="view-btn" onclick="openLightbox(this)">
-              <i class="fas fa-expand"></i>
-              చూడండి
-            </button>
-          </div>
-        </div>
-
-        <!-- Community Images -->
-        <div class="gallery-item" data-category="community">
-          <img src="https://images.unsplash.com/photo-1511632765486-a01980e01a18?auto=format&fit=crop&q=80" alt="సమాజ సేవ">
-          <div class="gallery-overlay">
-            <h3>సమాజ సేవ</h3>
-            <p>మా స్థానిక సమాజానికి ప్రేమతో సేవ చేయడం</p>
-            <button class="view-btn" onclick="openLightbox(this)">
-              <i class="fas fa-expand"></i>
-              చూడండి
-            </button>
-          </div>
-        </div>
-
-        <div class="gallery-item" data-category="community">
-          <img src="https://images.unsplash.com/photo-1523803326055-13445f07c8c9?auto=format&fit=crop&q=80" alt="సహవాస సమావేశం">
-          <div class="gallery-overlay">
-            <h3>సహవాస సమావేశం</h3>
-            <p>క్రీస్తులో సంబంధాలను నిర్మించడం</p>
-            <button class="view-btn" onclick="openLightbox(this)">
-              <i class="fas fa-expand"></i>
-              చూడండి
-            </button>
-          </div>
+          <div class="timeline" role="tablist" aria-label="Image navigation"></div>
         </div>
       </section>
     </main>
 
-    <!-- Lightbox -->
+    <!-- Enhanced Lightbox -->
     <div id="lightbox" class="lightbox" onclick="closeLightbox()">
-      <button class="close-lightbox" onclick="closeLightbox()">
-        <i class="fas fa-times"></i>
-      </button>
-      <img id="lightbox-img" src="" alt="">
-      <div class="lightbox-caption">
-        <h3 id="lightbox-title"></h3>
-        <p id="lightbox-description"></p>
+      <div class="lightbox-content" onclick="event.stopPropagation()">
+        <button class="close-lightbox" onclick="closeLightbox()" aria-label="Close lightbox">
+          <i class="fas fa-times"></i>
+        </button>
+        <img id="lightbox-img" src="" alt="">
       </div>
     </div>
 
