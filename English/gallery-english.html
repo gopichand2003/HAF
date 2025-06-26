@@ -65,10 +65,6 @@
             <i class="fas fa-video"></i>
             Videos
           </a>
-          <!-- <a href="services-english.html">
-            <i class="fas fa-place-of-worship"></i>
-            Services
-          </a> -->
           <a href="books-english.html">
             <i class="fas fa-book-bible"></i>
             Books
@@ -89,109 +85,37 @@
       </div>
     </nav>
 
-
     <main class="gallery-main">
       <section class="gallery-hero">
         <div class="gallery-hero-content">
-          <h1>Our Journey in Pictures</h1>
-          <p>Capturing moments of worship, fellowship, and service</p>
+          <h1>Our Journey Through Pictures</h1>
+          <p>Capturing precious moments of faith, fellowship, and divine blessings</p>
         </div>
       </section>
 
-      <section class="gallery-filters">
-        <button class="filter-btn active" data-filter="all">All</button>
-        <button class="filter-btn" data-filter="worship">Worship</button>
-        <button class="filter-btn" data-filter="events">Events</button>
-        <button class="filter-btn" data-filter="community">Community</button>
-      </section>
-
-      <section class="gallery-grid">
-        <!-- Worship Images -->
-        <div class="gallery-item" data-category="worship">
-          <img src="https://images.unsplash.com/photo-1438232992991-995b7058bbb3?auto=format&fit=crop&q=80" alt="Sunday Worship Service">
-          <div class="gallery-overlay">
-            <h3>Sunday Worship Service</h3>
-            <p>A moment of praise and worship during our Sunday service</p>
-            <button class="view-btn" onclick="openLightbox(this)">
-              <i class="fas fa-expand"></i>
-              View
-            </button>
+      <section class="gallery-content">
+        <div class="slideshow-container">
+          <div class="slides-3d-container">
+            <!-- Slides will be added by JavaScript -->
           </div>
-        </div>
-
-        <div class="gallery-item" data-category="worship">
-          <img src="https://images.unsplash.com/photo-1507692049790-de58290a4334?auto=format&fit=crop&q=80" alt="Prayer Meeting">
-          <div class="gallery-overlay">
-            <h3>Prayer Meeting</h3>
-            <p>United in prayer during our weekly gathering</p>
-            <button class="view-btn" onclick="openLightbox(this)">
-              <i class="fas fa-expand"></i>
-              View
-            </button>
+          <div class="prev-arrow nav-arrow" tabindex="0" role="button" aria-label="Previous image">
+            <i class="fas fa-chevron-left"></i>
           </div>
-        </div>
-
-        <!-- Events Images -->
-        <div class="gallery-item" data-category="events">
-          <img src="https://images.unsplash.com/photo-1511632765486-a01980e01a18?auto=format&fit=crop&q=80" alt="Christmas Celebration">
-          <div class="gallery-overlay">
-            <h3>Christmas Celebration</h3>
-            <p>Celebrating the birth of our Savior</p>
-            <button class="view-btn" onclick="openLightbox(this)">
-              <i class="fas fa-expand"></i>
-              View
-            </button>
+          <div class="next-arrow nav-arrow" tabindex="0" role="button" aria-label="Next image">
+            <i class="fas fa-chevron-right"></i>
           </div>
-        </div>
-
-        <div class="gallery-item" data-category="events">
-          <img src="https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&q=80" alt="Youth Conference">
-          <div class="gallery-overlay">
-            <h3>Youth Conference</h3>
-            <p>Empowering the next generation</p>
-            <button class="view-btn" onclick="openLightbox(this)">
-              <i class="fas fa-expand"></i>
-              View
-            </button>
-          </div>
-        </div>
-
-        <!-- Community Images -->
-        <div class="gallery-item" data-category="community">
-          <img src="https://images.unsplash.com/photo-1511632765486-a01980e01a18?auto=format&fit=crop&q=80" alt="Community Outreach">
-          <div class="gallery-overlay">
-            <h3>Community Outreach</h3>
-            <p>Serving our local community with love</p>
-            <button class="view-btn" onclick="openLightbox(this)">
-              <i class="fas fa-expand"></i>
-              View
-            </button>
-          </div>
-        </div>
-
-        <div class="gallery-item" data-category="community">
-          <img src="https://images.unsplash.com/photo-1523803326055-13445f07c8c9?auto=format&fit=crop&q=80" alt="Fellowship Gathering">
-          <div class="gallery-overlay">
-            <h3>Fellowship Gathering</h3>
-            <p>Building relationships in Christ</p>
-            <button class="view-btn" onclick="openLightbox(this)">
-              <i class="fas fa-expand"></i>
-              View
-            </button>
-          </div>
+          <div class="timeline" role="tablist" aria-label="Image navigation"></div>
         </div>
       </section>
     </main>
 
-    <!-- Lightbox -->
+    <!-- Enhanced Lightbox -->
     <div id="lightbox" class="lightbox" onclick="closeLightbox()">
-      <button class="close-lightbox" onclick="closeLightbox()">
-        <i class="fas fa-times"></i>
-      </button>
-      <img id="lightbox-img" src="" alt="">
-      <div class="lightbox-caption">
-        <h3 id="lightbox-title"></h3>
-        <p id="lightbox-description"></p>
+      <div class="lightbox-content" onclick="event.stopPropagation()">
+        <button class="close-lightbox" onclick="closeLightbox()" aria-label="Close lightbox">
+          <i class="fas fa-times"></i>
+        </button>
+        <img id="lightbox-img" src="" alt="">
       </div>
     </div>
 
