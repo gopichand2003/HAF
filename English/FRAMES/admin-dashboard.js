@@ -276,7 +276,8 @@ async function loadOrders() {
 
         for (const userDoc of usersSnapshot.docs) {
             const userData = userDoc.data();
-            if (userData.orders) {
+            // Only include orders from users who haven't been deleted
+            if (userData.orders && !userData.deleted) {
                 userData.orders.forEach(order => {
                     allOrders.push({
                         ...order,

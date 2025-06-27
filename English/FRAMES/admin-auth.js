@@ -1,8 +1,8 @@
 import { auth } from './firebase-config.js';
 import { signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-auth.js";
 
-const ADMIN_EMAIL = "itzgopi2003@gmail.com";
-const ADMIN_PASSWORD = "Gopichand"; // This is just for verification, actual auth is handled by Firebase
+const ADMIN_EMAIL = "Holyarmyfellowship1997@gmail.com";
+const ADMIN_PASSWORD = "1997@Haf"; // This is just for verification, actual auth is handled by Firebase
 
 function showMessage(message, isSuccess = false) {
     const messageDiv = document.getElementById('adminLoginMessage');
