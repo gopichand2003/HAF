@@ -1,4 +1,3 @@
-// 3D Slideshow Gallery JavaScript - Fixed version
 document.addEventListener('DOMContentLoaded', () => {
   const slideshowContainer = document.querySelector('.slideshow-container');
   const slides3DContainer = document.querySelector('.slides-3d-container');
@@ -54,7 +53,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let slides = [];
   let dots = [];
 
-  // Create slides and timeline dots
+
   slidesData.forEach((slide, index) => {
     const slideElement = document.createElement('div');
     slideElement.classList.add('slide');
@@ -65,9 +64,9 @@ document.addEventListener('DOMContentLoaded', () => {
       <img src="${slide.src}" alt="${slide.title}" loading="lazy">
     `;
     
-    // Add click event listener once during creation
+
     slideElement.addEventListener('click', (e) => {
-      // Only handle click if this is the active slide
+
       if (slideElement.classList.contains('active') && !isTransitioning) {
         openLightbox(slideElement, slide);
       }
@@ -100,7 +99,7 @@ document.addEventListener('DOMContentLoaded', () => {
     timeline.appendChild(dot);
   });
 
-  // Get references to created elements
+
   slides = document.querySelectorAll('.slide');
   dots = document.querySelectorAll('.dot');
 
@@ -128,10 +127,10 @@ document.addEventListener('DOMContentLoaded', () => {
       dot.setAttribute('aria-selected', index === currentIndex);
     });
 
-    // Reset transition flag after animation completes
+
     setTimeout(() => {
       isTransitioning = false;
-    }, 800); // Match the CSS transition duration
+    }, 800); 
   }
 
   function goToSlide(index) {
@@ -152,7 +151,7 @@ document.addEventListener('DOMContentLoaded', () => {
     updateSlides();
   }
 
-  // Event listeners for manual navigation
+
   prevArrow.addEventListener('click', (e) => {
     e.preventDefault();
     prevSlide();
@@ -163,9 +162,9 @@ document.addEventListener('DOMContentLoaded', () => {
     nextSlide();
   });
 
-  // Keyboard navigation
+
   document.addEventListener('keydown', (e) => {
-    // Only handle if not in lightbox and not transitioning
+
     const lightbox = document.getElementById('lightbox');
     if (lightbox && lightbox.classList.contains('active')) return;
     if (isTransitioning) return;
@@ -179,7 +178,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Arrow key navigation for arrows
+
   prevArrow.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
@@ -194,7 +193,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Touch/swipe support with improved handling
+
   let touchStartX = 0;
   let touchEndX = 0;
   let touchStartY = 0;
@@ -214,13 +213,13 @@ document.addEventListener('DOMContentLoaded', () => {
       const diffX = Math.abs(currentX - touchStartX);
       const diffY = Math.abs(currentY - touchStartY);
       
-      // Determine if this is a horizontal swipe
+      
       if (diffX > diffY && diffX > 10) {
         isSwiping = true;
-        e.preventDefault(); // Prevent scrolling only for horizontal swipes
+        e.preventDefault(); 
       }
     } else {
-      e.preventDefault(); // Continue preventing scroll during swipe
+      e.preventDefault(); 
     }
   }, { passive: false });
 
@@ -240,7 +239,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const diffX = touchStartX - touchEndX;
     const diffY = Math.abs(touchStartY - touchEndY);
     
-    // Only handle horizontal swipes
+    
     if (Math.abs(diffX) > swipeThreshold && diffY < swipeThreshold * 1.5) {
       if (diffX > 0) {
         nextSlide();
@@ -250,7 +249,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // Enhanced Lightbox functionality
+  
   function openLightbox(slideElement, slideData) {
     const img = slideElement.querySelector('img');
     const lightbox = document.getElementById('lightbox');
@@ -263,7 +262,7 @@ document.addEventListener('DOMContentLoaded', () => {
     lightbox.classList.add('active');
     document.body.style.overflow = 'hidden';
     
-    // Focus management
+    
     const closeButton = lightbox.querySelector('.close-lightbox');
     if (closeButton) closeButton.focus();
   }
@@ -274,7 +273,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     const lightboxContent = lightbox.querySelector('.lightbox-content');
     
-    // Add exit animation
+    
     if (lightboxContent) {
       lightboxContent.style.animation = 'lightboxSlideOut 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
     }
@@ -286,13 +285,13 @@ document.addEventListener('DOMContentLoaded', () => {
         lightboxContent.style.animation = '';
       }
       
-      // Return focus to the active slide
+      
       const activeSlide = document.querySelector('.slide.active');
       if (activeSlide) activeSlide.focus();
     }, 300);
   };
 
-  // Close lightbox with Escape key
+  
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
       const lightbox = document.getElementById('lightbox');
@@ -302,18 +301,18 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Initialize
+  
   updateSlides();
 
-  // Preload images for better performance
+  
   slidesData.forEach((slide, index) => {
-    if (index > 0) { // Skip first image as it's already loaded
+    if (index > 0) { 
       const img = new Image();
       img.src = slide.src;
     }
   });
 
-  // Add exit animation keyframes
+  
   const style = document.createElement('style');
   style.textContent = `
     @keyframes lightboxSlideOut {
@@ -329,17 +328,17 @@ document.addEventListener('DOMContentLoaded', () => {
   `;
   document.head.appendChild(style);
 
-  // Prevent context menu on slides to avoid accidental interactions
+   
   slides3DContainer.addEventListener('contextmenu', (e) => {
     e.preventDefault();
   });
 
-  // Prevent drag on images
+
   slides3DContainer.addEventListener('dragstart', (e) => {
     e.preventDefault();
   });
 
-  // Prevent selection on slides
+
   slides3DContainer.addEventListener('selectstart', (e) => {
     e.preventDefault();
   });

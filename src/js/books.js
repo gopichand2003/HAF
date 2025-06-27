@@ -1,4 +1,3 @@
-// Book content data structure
 const books = {
   'part1': {
     title: 'UJJEVA PRASANGAMULU - 1',
@@ -262,7 +261,7 @@ const books = {
 let currentBook = '';
 let currentChapter = 0;
 
-// Function to open the reader modal
+
 function openReader(bookId) {
   currentBook = bookId;
   currentChapter = 0;
@@ -271,10 +270,10 @@ function openReader(bookId) {
   const contentElement = document.getElementById('readerContent');
   const chapterSelect = document.getElementById('chapterSelect');
 
-  // Set the book title
+
   titleElement.textContent = books[bookId].title;
 
-  // Clear and populate chapter select
+ 
   chapterSelect.innerHTML = '';
   books[bookId].chapters.forEach((chapter, index) => {
     const option = document.createElement('option');
@@ -283,35 +282,35 @@ function openReader(bookId) {
     chapterSelect.appendChild(option);
   });
 
-  // Load first chapter
+ 
   loadChapter(0);
 
-  // Show modal
+
   modal.style.display = 'flex';
-  document.body.style.overflow = 'hidden'; // Prevent background scrolling
+  document.body.style.overflow = 'hidden'; 
 }
 
-// Function to load a chapter
+
 function loadChapter(chapterIndex) {
   const contentElement = document.getElementById('readerContent');
   const chapterSelect = document.getElementById('chapterSelect');
   
-  // Update content
+
   contentElement.innerHTML = books[currentBook].chapters[chapterIndex].content;
   chapterSelect.value = chapterIndex;
   
-  // Scroll content to top
+ 
   contentElement.scrollTop = 0;
 }
 
-// Function to close the reader modal
+
 function closeReader() {
   const modal = document.getElementById('readerModal');
   modal.style.display = 'none';
-  document.body.style.overflow = ''; // Restore background scrolling
+  document.body.style.overflow = ''; 
 }
 
-// Function to navigate between chapters
+
 function navigateChapter(direction) {
   const newChapter = currentChapter + direction;
   if (newChapter >= 0 && newChapter < books[currentBook].chapters.length) {
@@ -320,14 +319,14 @@ function navigateChapter(direction) {
   }
 }
 
-// Function to handle chapter select change
+
 function changeChapter() {
   const chapterSelect = document.getElementById('chapterSelect');
   currentChapter = parseInt(chapterSelect.value);
   loadChapter(currentChapter);
 }
 
-// Close modal when clicking outside
+
 document.addEventListener('click', (e) => {
   const modal = document.getElementById('readerModal');
   const readerContent = document.querySelector('.reader-content');
@@ -336,7 +335,7 @@ document.addEventListener('click', (e) => {
   }
 });
 
-// Handle escape key to close modal
+
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') {
     closeReader();

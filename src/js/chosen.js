@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', function() {
-  // Existing chapter functionality
+
   const chapters = document.querySelectorAll('.chapter');
   const header = document.querySelector('header');
   const headerHeight = header ? header.offsetHeight : 120;
@@ -13,10 +13,10 @@ document.addEventListener('DOMContentLoaded', function() {
           e.preventDefault();
           const isActive = chapter.classList.contains('active');
           
-          // Close all chapters
+
           chapters.forEach(ch => {
             ch.classList.remove('active');
-            // Find and pause any playing audio in this chapter
+
             const audioElement = ch.querySelector('audio');
             const audioContainer = ch.querySelector('.audio-container');
             const playBtn = ch.querySelector('.audio-play-btn');
@@ -33,11 +33,11 @@ document.addEventListener('DOMContentLoaded', function() {
             }
           });
           
-          // Toggle current chapter
+
           if (!isActive) {
             chapter.classList.add('active');
             
-            // Apply scrolling animation for all chapters except the first one
+
             if (index >= 1) {
               const chapterRect = chapter.getBoundingClientRect();
               if (chapterRect.top < headerHeight) {
@@ -52,13 +52,13 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     });
     
-    // All chapters start collapsed by default
+
     chapters.forEach(ch => {
       ch.classList.remove('active');
     });
   }
 
-  // Audio player functionality
+
   function initializeAudioPlayers() {
     console.log('Initializing audio players...');
     const audioPlayers = document.querySelectorAll('.audio-player');
@@ -66,7 +66,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     let currentlyPlaying = null;
 
-    // Format time in MM:SS
+
     function formatTime(seconds) {
       const mins = Math.floor(seconds / 60);
       const secs = Math.floor(seconds % 60);
@@ -82,7 +82,7 @@ document.addEventListener('DOMContentLoaded', function() {
       const progress = player.querySelector('.audio-progress');
       const container = player.closest('.audio-container');
 
-      // Log the elements we found
+
       console.log('Player elements:', {
         audio: !!audio,
         playBtn: !!playBtn,
@@ -96,10 +96,10 @@ document.addEventListener('DOMContentLoaded', function() {
         return;
       }
 
-      // Log audio source
+
       console.log('Audio source:', audio.src);
 
-      // Update progress bar
+
       function updateProgress() {
         if (audio.duration && !isNaN(audio.duration)) {
           const percent = (audio.currentTime / audio.duration) * 100;
@@ -107,7 +107,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
       }
 
-      // Handle play/pause
       playBtn.addEventListener('click', () => {
         console.log(`Play button clicked for player ${index + 1}`);
         
@@ -145,7 +144,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
       });
 
-      // Handle progress bar click
       progress.addEventListener('click', (e) => {
         console.log('Progress bar clicked');
         const rect = progress.getBoundingClientRect();
@@ -156,17 +154,17 @@ document.addEventListener('DOMContentLoaded', function() {
         }
       });
 
-      // Update progress as audio plays
+
       audio.addEventListener('timeupdate', updateProgress);
 
-      // Handle audio loading
+
       audio.addEventListener('loadedmetadata', () => {
         console.log(`Audio metadata loaded for player ${index + 1}`);
         console.log('Audio duration:', audio.duration);
         updateProgress();
       });
 
-      // Reset when audio ends
+
       audio.addEventListener('ended', () => {
         console.log('Audio ended');
         container.classList.remove('playing');
@@ -175,7 +173,7 @@ document.addEventListener('DOMContentLoaded', function() {
         currentlyPlaying = null;
       });
 
-      // Handle audio errors
+
       audio.addEventListener('error', (e) => {
         console.error('Audio error:', e);
         console.error('Error details:', audio.error);
@@ -185,15 +183,15 @@ document.addEventListener('DOMContentLoaded', function() {
         currentlyPlaying = null;
       });
 
-      // Set initial state
+
       progressBar.style.width = '0%';
       
-      // Log successful initialization
+
       console.log(`Player ${index + 1} initialized successfully`);
     });
   }
 
-  // Initialize audio players with a slight delay to ensure DOM is ready
+
   setTimeout(() => {
     console.log('Starting audio player initialization...');
     initializeAudioPlayers();
