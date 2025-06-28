@@ -103,11 +103,18 @@ body::before {
       rgba(255, 255, 255, 0.92)
     ),
     url('../images/bg/Logo\ Png.png');
-  background-size: cover;
+  background-size: 75% auto;
   background-position: center;
   background-repeat: no-repeat;
   background-attachment: fixed;
   z-index: -1;
+}
+
+/* Mobile background configuration */
+@media (max-width: 768px) {
+  body::before {
+    background-size: 150% auto;
+  }
 }
 
 /* Header and Logo Styles */
@@ -347,7 +354,7 @@ html[lang='hi'] .site-title h1 {
   transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
   z-index: 1001;
   box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
-  overflow-y: auto
+  overflow-y: auto;
 }
 
 header.transparent .main-nav {
@@ -426,14 +433,14 @@ header.transparent .main-nav {
   color: var(--secondary-color);
 }
 
-
 .dropdown-toggle i.fa-chevron-down {
   margin-left: auto;
   font-size: 0.8rem;
   color: inherit;
 }
 
-.nav-links a:hover::after, .nav-links a.active::after {
+.nav-links a:hover::after,
+.nav-links a.active::after {
   transform: scaleX(1);
   transform-origin: left;
 }
@@ -451,7 +458,8 @@ header.transparent .main-nav {
   transition: transform 0.3s ease;
 }
 
-.nav-transparent a:hover::after, .nav-transparent a.active::after {
+.nav-transparent a:hover::after,
+.nav-transparent a.active::after {
   transform: scaleX(1);
   transform-origin: left;
 }
@@ -491,7 +499,7 @@ header.transparent .main-nav {
 
 .nav-transparent .nav-links a,
 .nav-transparent .dropdown-toggle {
-  color: #1a365d ;
+  color: #1a365d;
   font-weight: 500;
 }
 
@@ -578,13 +586,13 @@ header.transparent .dropdown-menu {
 }
 
 .hero {
-    margin-top: 120px;
-    padding: 3rem 2rem;
-    text-align: center;
-    color: var(--primary-color);
-    position: relative;
-    z-index: 1;
-  }
+  margin-top: 120px;
+  padding: 3rem 2rem;
+  text-align: center;
+  color: var(--primary-color);
+  position: relative;
+  z-index: 1;
+}
 
 .hero-content {
   max-width: 800px;
