@@ -39,7 +39,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (videoId) {
       // Store the iframe URL for later use
-      container.dataset.videoUrl = `https://www.youtube.com/embed/${videoId}?enablejsapi=1&rel=0&showinfo=0&modestbranding=1`;
+      container.dataset.videoUrl = `https://www.youtube.com/embed/${videoId}?enablejsapi=1&autoplay=0&rel=0&showinfo=0&modestbranding=1`;
 
       // Replace iframe with thumbnail
       const thumbnail = createThumbnail(videoId);
@@ -65,7 +65,7 @@ document.addEventListener('DOMContentLoaded', () => {
     iframe.frameBorder = '0';
     iframe.allowFullscreen = true;
     iframe.allow =
-      'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
+      'accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
 
     container.innerHTML = '';
     container.appendChild(iframe);
@@ -73,8 +73,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const videoId = getYouTubeVideoId(videoUrl);
     return new YT.Player(iframe, {
       videoId: videoId,
+      playerVars: {
+        autoplay: 0,
+        rel: 0,
+        showinfo: 0,
+        modestbranding: 1
+      },
       events: {
         onStateChange: onPlayerStateChange,
+        onReady: function(event) {
+          // Ensure video doesn't autoplay
+          event.target.pauseVideo();
+        }
       },
     });
   }
@@ -160,6 +170,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const isCollapsed = section.classList.contains('collapsed');
 
         stopCurrentVideo();
+        stopAllPlayers();
 
         sections.forEach((s) => {
           s.classList.add('collapsed');
@@ -181,6 +192,19 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }
   });
+
+  // Function to stop all players
+  function stopAllPlayers() {
+    Object.keys(players).forEach(videoId => {
+      try {
+        if (players[videoId] && typeof players[videoId].stopVideo === 'function') {
+          players[videoId].stopVideo();
+        }
+      } catch (e) {
+        console.error('Error stopping player:', e);
+      }
+    });
+  }
 
   // Function to check if any videos are visible in a section
   function checkVisibleVideos(section) {
