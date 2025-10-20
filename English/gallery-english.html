@@ -88,34 +88,61 @@
     <main class="gallery-main">
       <section class="gallery-hero">
         <div class="gallery-hero-content">
-          <h1>Our Journey Through Pictures</h1>
+          <h1>Our Journey in Pictures</h1>
           <p>Capturing precious moments of faith, fellowship, and divine blessings</p>
         </div>
       </section>
 
+      <section class="gallery-filter">
+        <div class="filter-container">
+          <button class="filter-btn active" data-filter="all">
+            <i class="fas fa-th"></i> All Photos
+          </button>
+          <button class="filter-btn" data-filter="worship">
+            <i class="fas fa-praying-hands"></i> Worship
+          </button>
+          <button class="filter-btn" data-filter="milestones">
+            <i class="fas fa-trophy"></i> Milestones
+          </button>
+          <button class="filter-btn" data-filter="community">
+            <i class="fas fa-users"></i> Community
+          </button>
+          <button class="filter-btn" data-filter="events">
+            <i class="fas fa-calendar-star"></i> Events
+          </button>
+          <button class="filter-btn" data-filter="outreach">
+            <i class="fas fa-hands-helping"></i> Outreach
+          </button>
+        </div>
+      </section>
+
       <section class="gallery-content">
-        <div class="slideshow-container">
-          <div class="slides-3d-container">
-            <!-- Slides will be added by JavaScript -->
-          </div>
-          <div class="prev-arrow nav-arrow" tabindex="0" role="button" aria-label="Previous image">
-            <i class="fas fa-chevron-left"></i>
-          </div>
-          <div class="next-arrow nav-arrow" tabindex="0" role="button" aria-label="Next image">
-            <i class="fas fa-chevron-right"></i>
-          </div>
-          <div class="timeline" role="tablist" aria-label="Image navigation"></div>
+        <div class="gallery-grid" id="galleryGrid">
+          <!-- Gallery items will be added by JavaScript -->
         </div>
       </section>
     </main>
 
     <!-- Enhanced Lightbox -->
-    <div id="lightbox" class="lightbox" onclick="closeLightbox()">
-      <div class="lightbox-content" onclick="event.stopPropagation()">
-        <button class="close-lightbox" onclick="closeLightbox()" aria-label="Close lightbox">
+    <div id="lightbox" class="lightbox">
+      <div class="lightbox-content">
+        <button class="close-lightbox" aria-label="Close lightbox">
           <i class="fas fa-times"></i>
         </button>
-        <img id="lightbox-img" src="" alt="">
+        <button class="lightbox-prev" aria-label="Previous image">
+          <i class="fas fa-chevron-left"></i>
+        </button>
+        <button class="lightbox-next" aria-label="Next image">
+          <i class="fas fa-chevron-right"></i>
+        </button>
+        <div class="lightbox-image-container">
+          <img id="lightbox-img" src="" alt="">
+          <div class="lightbox-info">
+            <h3 id="lightbox-title"></h3>
+            <p id="lightbox-description"></p>
+            <span id="lightbox-category" class="lightbox-badge"></span>
+          </div>
+        </div>
       </div>
     </div>
 
