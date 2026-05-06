@@ -3,116 +3,43 @@ document.addEventListener('DOMContentLoaded', () => {
   const filterButtons = document.querySelectorAll('.filter-btn');
   const lightbox = document.getElementById('lightbox');
   const lightboxImg = document.getElementById('lightbox-img');
-  const lightboxTitle = document.getElementById('lightbox-title');
-  const lightboxDescription = document.getElementById('lightbox-description');
-  const lightboxCategory = document.getElementById('lightbox-category');
   const closeBtn = document.querySelector('.close-lightbox');
   const prevBtn = document.querySelector('.lightbox-prev');
   const nextBtn = document.querySelector('.lightbox-next');
 
+  // Simply add your image paths here. Everything is categorized as 'foundation'
   const galleryData = [
-    {
-      src: 'https://images.pexels.com/photos/8468/guitar-music-musician-musical-instrument.jpg?auto=compress&cs=tinysrgb&w=800',
-      title: 'Worship Through Music',
-      // description: 'Hearts united in melodious praise, lifting our voices to the heavens in perfect harmony',
-      category: 'worship'
-    },
-    {
-      src: 'https://images.pexels.com/photos/8468633/pexels-photo-8468633.jpeg?auto=compress&cs=tinysrgb&w=800',
-      title: 'Community Prayer',
-      description: 'Gathering in unity, seeking divine guidance through collective prayer and meditation',
-      category: 'community'
-    },
-    {
-      src: 'https://images.pexels.com/photos/1166209/pexels-photo-1166209.jpeg?auto=compress&cs=tinysrgb&w=800',
-      title: 'Youth Ministry',
-      description: 'Empowering the next generation with faith, hope, and divine purpose',
-      category: 'community'
-    },
-    {
-      src: 'https://images.pexels.com/photos/1587927/pexels-photo-1587927.jpeg?auto=compress&cs=tinysrgb&w=800',
-      title: 'Baptism Ceremony',
-      description: 'Sacred moments of spiritual rebirth and commitment to Christ',
-      category: 'milestones'
-    },
-    {
-      src: 'https://images.pexels.com/photos/1708936/pexels-photo-1708936.jpeg?auto=compress&cs=tinysrgb&w=800',
-      title: 'Fellowship Gathering',
-      description: 'Building lasting bonds through shared faith and Christian brotherhood',
-      category: 'community'
-    },
-    {
-      src: 'https://images.pexels.com/photos/1387174/pexels-photo-1387174.jpeg?auto=compress&cs=tinysrgb&w=800',
-      title: 'Christmas Celebration',
-      description: 'Celebrating the birth of our Savior with joy, love, and thanksgiving',
-      category: 'events'
-    },
-    {
-      src: 'https://images.pexels.com/photos/1708988/pexels-photo-1708988.jpeg?auto=compress&cs=tinysrgb&w=800',
-      title: 'Community Outreach',
-      description: 'Serving our neighbors with Christ\'s love through acts of compassion',
-      category: 'outreach'
-    },
-    {
-      src: 'https://images.pexels.com/photos/2774556/pexels-photo-2774556.jpeg?auto=compress&cs=tinysrgb&w=800',
-      title: 'Sunday Service',
-      description: 'Weekly gathering for worship, teaching, and spiritual nourishment',
-      category: 'worship'
-    },
-    {
-      src: 'https://images.pexels.com/photos/1595391/pexels-photo-1595391.jpeg?auto=compress&cs=tinysrgb&w=800',
-      title: 'Founding Anniversary',
-      description: 'Celebrating 25 years of faithful service and divine blessings',
-      category: 'milestones'
-    },
-    {
-      src: 'https://images.pexels.com/photos/6646918/pexels-photo-6646918.jpeg?auto=compress&cs=tinysrgb&w=800',
-      title: 'Children\'s Ministry',
-      description: 'Nurturing young hearts with biblical truths and Christ\'s love',
-      category: 'community'
-    },
-    {
-      src: 'https://images.pexels.com/photos/3184325/pexels-photo-3184325.jpeg?auto=compress&cs=tinysrgb&w=800',
-      title: 'Easter Sunrise Service',
-      description: 'Welcoming the risen Savior with joyful hearts at dawn',
-      category: 'events'
-    },
-    {
-      src: 'https://images.pexels.com/photos/1722183/pexels-photo-1722183.jpeg?auto=compress&cs=tinysrgb&w=800',
-      title: 'Food Distribution',
-      description: 'Feeding the hungry and sharing God\'s abundant provision',
-      category: 'outreach'
-    },
-    {
-      src: 'https://images.pexels.com/photos/8815965/pexels-photo-8815965.jpeg?auto=compress&cs=tinysrgb&w=800',
-      title: 'Praise & Worship Night',
-      description: 'An evening devoted to glorifying God through song and dance',
-      category: 'worship'
-    },
-    {
-      src: 'https://images.pexels.com/photos/3860307/pexels-photo-3860307.jpeg?auto=compress&cs=tinysrgb&w=800',
-      title: 'New Building Dedication',
-      description: 'Consecrating our new sanctuary to the Lord\'s service',
-      category: 'milestones'
-    },
-    {
-      src: 'https://images.pexels.com/photos/5206040/pexels-photo-5206040.jpeg?auto=compress&cs=tinysrgb&w=800',
-      title: 'Family Camp',
-      description: 'Strengthening family bonds through faith-centered activities',
-      category: 'events'
-    },
-    {
-      src: 'https://images.pexels.com/photos/6646917/pexels-photo-6646917.jpeg?auto=compress&cs=tinysrgb&w=800',
-      title: 'Street Ministry',
-      description: 'Taking the Gospel to the streets and sharing hope with the lost',
-      category: 'outreach'
-    }
+    { src: '../src/images/gallery/1.png', category: 'foundation' },
+    { src: '../src/images/gallery/2.jpg', category: 'foundation' },
+    { src: '../src/images/gallery/3.jpg', category: 'foundation' },
+    { src: '../src/images/gallery/4.jpg', category: 'foundation' },
+    { src: '../src/images/gallery/5.jpg', category: 'foundation' },
+    { src: '../src/images/gallery/6.jpg', category: 'foundation' },
+    { src: '../src/images/gallery/7.jpg', category: 'foundation' },
+    { src: '../src/images/gallery/8.jpg', category: 'foundation' },
+    { src: '../src/images/gallery/9.jpg', category: 'foundation' },
+    { src: '../src/images/gallery/10.jpg', category: 'foundation' },
+    { src: '../src/images/gallery/11.jpg', category: 'foundation' },
+    { src: '../src/images/gallery/12.jpg', category: 'foundation' },
+    { src: '../src/images/gallery/13.jpg', category: 'foundation' },
+    { src: '../src/images/gallery/14.jpg', category: 'foundation' },
+    { src: '../src/images/gallery/15.jpg', category: 'foundation' },
+    { src: '../src/images/gallery/16.jpg', category: 'foundation' },
+    { src: '../src/images/gallery/17.jpg', category: 'foundation' },
+    { src: '../src/images/gallery/18.jpg', category: 'foundation' },
+    { src: '../src/images/gallery/19.jpg', category: 'foundation' },
+    { src: '../src/images/gallery/20.jpg', category: 'foundation' },
+    { src: '../src/images/gallery/21.jpg', category: 'foundation' },
+    { src: '../src/images/gallery/22.jpg', category: 'foundation' },
+    { src: '../src/images/gallery/23.jpg', category: 'foundation' },
+    { src: '../src/images/gallery/24.jpg', category: 'foundation' }
   ];
 
   let currentImageIndex = 0;
   let currentFilter = 'all';
   let filteredGallery = [...galleryData];
 
+  // Creates pure image items without text overlays
   function createGalleryItem(item, index) {
     const galleryItem = document.createElement('div');
     galleryItem.classList.add('gallery-item');
@@ -122,12 +49,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     galleryItem.innerHTML = `
       <div class="gallery-item-image">
-        <img src="${item.src}" alt="${item.title}" loading="lazy">
-        <div class="gallery-item-overlay">
-          <div class="gallery-item-title">${item.title}</div>
-          <div class="gallery-item-description">${item.description}</div>
-        </div>
-        <span class="gallery-item-category">${getCategoryLabel(item.category)}</span>
+        <img src="${item.src}" alt="Church Construction Progress" loading="lazy">
       </div>
     `;
 
@@ -136,17 +58,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     return galleryItem;
-  }
-
-  function getCategoryLabel(category) {
-    const labels = {
-      worship: 'Worship',
-      milestones: 'Milestones',
-      community: 'Community',
-      events: 'Events',
-      outreach: 'Outreach'
-    };
-    return labels[category] || category;
   }
 
   function renderGallery() {
@@ -169,7 +80,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const items = document.querySelectorAll('.gallery-item');
     items.forEach(item => {
       item.style.animation = 'none';
-      item.offsetHeight;
+      item.offsetHeight; // trigger reflow
       item.style.animation = null;
     });
 
@@ -201,10 +112,6 @@ document.addEventListener('DOMContentLoaded', () => {
   function updateLightboxContent() {
     const item = filteredGallery[currentImageIndex];
     lightboxImg.src = item.src;
-    lightboxImg.alt = item.title;
-    lightboxTitle.textContent = item.title;
-    lightboxDescription.textContent = item.description;
-    lightboxCategory.textContent = getCategoryLabel(item.category);
   }
 
   function showNextImage() {
@@ -223,7 +130,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   lightbox.addEventListener('click', (e) => {
-    if (e.target === lightbox) {
+    if (e.target === lightbox || e.target.classList.contains('lightbox-image-container')) {
       closeLightbox();
     }
   });
@@ -281,6 +188,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   renderGallery();
 
+  // Preload images for smoother lightbox transitions
   galleryData.forEach((item, index) => {
     if (index > 0) {
       const img = new Image();
