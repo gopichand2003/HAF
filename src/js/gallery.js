@@ -187,12 +187,4 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   renderGallery();
-
-  // Preload images for smoother lightbox transitions
-  galleryData.forEach((item, index) => {
-    if (index > 0) {
-      const img = new Image();
-      img.src = item.src;
-    }
-  });
 });
