@@ -9,8 +9,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Simply add your image paths here. Everything is categorized as 'foundation'
   const galleryData = [
-    { src: '../src/images/gallery/1.png', category: 'foundation' },
-    { src: '../src/images/gallery/2.jpg', category: 'foundation' },
+    { src: 'HAF/src/images/gallery/1.png', category: 'foundation' },
+    { src: '/src/images/gallery/2.jpg', category: 'foundation' },
     { src: '../src/images/gallery/3.jpg', category: 'foundation' },
     { src: '../src/images/gallery/4.jpg', category: 'foundation' },
     { src: '../src/images/gallery/5.jpg', category: 'foundation' },
