@@ -5843,7 +5843,6 @@ sections.forEach((section) => {
         controls.className = 'video-controls';
         controls.style.cssText = "display:flex; gap:10px; margin: 15px 0;";
         controls.innerHTML = `
-            <button class="control-btn" id="sortLatest"><i class="fas fa-clock"></i> Latest</button>
             <button class="control-btn" id="shuffleVideos"><i class="fas fa-random"></i> Shuffle</button>
         `;
         searchBox.after(controls);
@@ -5855,16 +5854,6 @@ sections.forEach((section) => {
                 const j = Math.floor(Math.random() * (i + 1));
                 grid.appendChild(cards[j]);
             }
-        });
-
-        controls.querySelector('#sortLatest').addEventListener('click', () => {
-            stopCurrentVideo();
-            const cards = Array.from(grid.children).sort((a, b) => {
-                const dateA = new Date(a.querySelector('.message-date')?.textContent || '1900-01-01');
-                const dateB = new Date(b.querySelector('.message-date')?.textContent || '1900-01-01');
-                return dateB - dateA;
-            });
-            cards.forEach(card => grid.appendChild(card));
         });
     });
 });
