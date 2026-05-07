@@ -213,6 +213,38 @@
   box-shadow: 0 0 10px rgba(44, 74, 124, 0.1);
 }
 
+.testimonies-controls {
+  display: flex;
+  gap: 10px;
+  margin: 15px auto;
+  max-width: 600px;
+  padding: 0 2rem;
+  justify-content: center;
+}
+
+.control-btn {
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+}
+
+.control-btn:hover {
+  background: var(--secondary-color);
+  transform: translateY(-2px);
+}
+
+.control-btn i {
+  font-size: 1rem;
+}
+
 .no-results {
   text-align: center;
   padding: 2rem;

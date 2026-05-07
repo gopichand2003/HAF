@@ -96,6 +96,10 @@
         >
       </div>
 
+      <div class="testimonies-controls">
+        <button class="control-btn" id="shuffleTestimonies"><i class="fas fa-random"></i> Shuffle</button>
+      </div>
+
       <div class="no-results">
         <p>మీరు వెతికిన పేరుతో సాక్ష్యం లభించలేదు.</p>
         <p>దయచేసి మరొక పేరు ప్రయత్నించండి.</p>
@@ -1400,6 +1404,16 @@
         });
         noResults.style.display = hasResults ? 'none' : 'block';
       }
+
+      // Shuffle Testimonies
+      document.getElementById('shuffleTestimonies').addEventListener('click', () => {
+        const grid = document.querySelector('.testimonies-grid');
+        const cards = Array.from(grid.children);
+        for (let i = cards.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          grid.appendChild(cards[j]);
+        }
+      });
     </script>
   </body>
 </html>
