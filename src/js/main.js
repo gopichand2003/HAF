@@ -82,10 +82,13 @@ const timelineItems = document.querySelectorAll('.timeline-item');
 const timelineHeight = timeline.offsetHeight;
 let lastScrollTop = window.pageYOffset || document.documentElement.scrollTop;
 
+if (timelineItems.length > 0) {
+  timelineItems[0].classList.add('visible');
+}
+
 function updateTimeline() {
   const scrollPosition = window.scrollY;
   const timelineTop = timeline.offsetTop;
-  const timelineBottom = timelineTop + timelineHeight;
   const windowHeight = window.innerHeight;
   const scrollPercentage = Math.min(
     Math.max(
@@ -101,17 +104,13 @@ function updateTimeline() {
 
   const currentScrollTop =
     window.pageYOffset || document.documentElement.scrollTop;
-  const scrollingDown = currentScrollTop > lastScrollTop;
-  lastScrollTop = currentScrollTop;
+  const triggerPoint = scrollPosition + windowHeight * 0.8;
 
-  timelineItems.forEach((item) => {
+  timelineItems.forEach((item, index) => {
     const itemTop = item.offsetTop + timelineTop;
-    const triggerPoint = scrollPosition + windowHeight * 0.8;
 
-    if (scrollingDown && triggerPoint > itemTop) {
+    if (index === 0 || triggerPoint > itemTop) {
       item.classList.add('visible');
-    } else if (!scrollingDown && triggerPoint < itemTop + item.offsetHeight) {
-      item.classList.remove('visible');
     }
   });
 }
