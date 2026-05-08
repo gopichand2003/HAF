@@ -1,4 +1,5 @@
-document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener('DOMContentLoaded', () => {
+
   const galleryGrid = document.getElementById('galleryGrid');
   const filterButtons = document.querySelectorAll('.filter-btn');
   const lightbox = document.getElementById('lightbox');
@@ -7,7 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const prevBtn = document.querySelector('.lightbox-prev');
   const nextBtn = document.querySelector('.lightbox-next');
 
-  // Simply add your image paths here. Everything is categorized as 'foundation'
+  // Gallery Data
   const galleryData = [
     { src: 'https://i.ibb.co/nqV5jZDd/1.webp', category: 'foundation' },
     { src: 'https://i.ibb.co/zVwpyC1j/17.webp', category: 'foundation' },
@@ -39,17 +40,25 @@ document.addEventListener('DOMContentLoaded', () => {
   let currentFilter = 'all';
   let filteredGallery = [...galleryData];
 
-  // Creates pure image items without text overlays
+  // Create Gallery Item
   function createGalleryItem(item, index) {
+
     const galleryItem = document.createElement('div');
-    galleryItem.classList.add('gallery-item');
+
+    galleryItem.className = 'gallery-item';
     galleryItem.dataset.category = item.category;
     galleryItem.dataset.index = index;
-    galleryItem.style.animationDelay = `${index * 0.05}s`;
 
     galleryItem.innerHTML = `
       <div class="gallery-item-image">
-        <img src="${item.src}" alt="Church Construction Progress" loading="lazy">
+        <img
+          src="${item.src}"
+          alt="Church Construction Progress"
+          loading="${index < 4 ? 'eager' : 'lazy'}"
+          decoding="async"
+          width="400"
+          height="300"
+        >
       </div>
     `;
 
@@ -60,15 +69,24 @@ document.addEventListener('DOMContentLoaded', () => {
     return galleryItem;
   }
 
+  // Render Gallery Optimized
   function renderGallery() {
+
     galleryGrid.innerHTML = '';
+
+    const fragment = document.createDocumentFragment();
+
     filteredGallery.forEach((item, index) => {
       const galleryItem = createGalleryItem(item, index);
-      galleryGrid.appendChild(galleryItem);
+      fragment.appendChild(galleryItem);
     });
+
+    galleryGrid.appendChild(fragment);
   }
 
+  // Filter Gallery
   function filterGallery(category) {
+
     currentFilter = category;
 
     if (category === 'all') {
@@ -77,107 +95,155 @@ document.addEventListener('DOMContentLoaded', () => {
       filteredGallery = galleryData.filter(item => item.category === category);
     }
 
-    const items = document.querySelectorAll('.gallery-item');
-    items.forEach(item => {
-      item.style.animation = 'none';
-      item.offsetHeight; // trigger reflow
-      item.style.animation = null;
-    });
-
     renderGallery();
   }
 
+  // Filter Button Events
   filterButtons.forEach(button => {
+
     button.addEventListener('click', () => {
-      filterButtons.forEach(btn => btn.classList.remove('active'));
+
+      filterButtons.forEach(btn => {
+        btn.classList.remove('active');
+      });
+
       button.classList.add('active');
 
       const filter = button.dataset.filter;
+
       filterGallery(filter);
     });
   });
 
+  // Open Lightbox
   function openLightbox(index) {
+
     currentImageIndex = index;
+
     updateLightboxContent();
+
     lightbox.classList.add('active');
+
     document.body.style.overflow = 'hidden';
   }
 
+  // Close Lightbox
   function closeLightbox() {
+
     lightbox.classList.remove('active');
+
     document.body.style.overflow = 'auto';
   }
 
+  // Update Lightbox Image
   function updateLightboxContent() {
+
     const item = filteredGallery[currentImageIndex];
+
     lightboxImg.src = item.src;
   }
 
+  // Next Image
   function showNextImage() {
-    currentImageIndex = (currentImageIndex + 1) % filteredGallery.length;
+
+    currentImageIndex =
+      (currentImageIndex + 1) % filteredGallery.length;
+
     updateLightboxContent();
   }
 
+  // Previous Image
   function showPrevImage() {
-    currentImageIndex = (currentImageIndex - 1 + filteredGallery.length) % filteredGallery.length;
+
+    currentImageIndex =
+      (currentImageIndex - 1 + filteredGallery.length) %
+      filteredGallery.length;
+
     updateLightboxContent();
   }
 
+  // Close Button
   closeBtn.addEventListener('click', (e) => {
+
     e.stopPropagation();
+
     closeLightbox();
   });
 
+  // Close On Background Click
   lightbox.addEventListener('click', (e) => {
-    if (e.target === lightbox || e.target.classList.contains('lightbox-image-container')) {
+
+    if (
+      e.target === lightbox ||
+      e.target.classList.contains('lightbox-image-container')
+    ) {
       closeLightbox();
     }
   });
 
+  // Prev Button
   prevBtn.addEventListener('click', (e) => {
+
     e.stopPropagation();
+
     showPrevImage();
   });
 
+  // Next Button
   nextBtn.addEventListener('click', (e) => {
+
     e.stopPropagation();
+
     showNextImage();
   });
 
+  // Keyboard Controls
   document.addEventListener('keydown', (e) => {
+
     if (!lightbox.classList.contains('active')) return;
 
-    switch(e.key) {
+    switch (e.key) {
+
       case 'Escape':
         closeLightbox();
         break;
+
       case 'ArrowLeft':
         showPrevImage();
         break;
+
       case 'ArrowRight':
         showNextImage();
         break;
     }
   });
 
+  // Swipe Support
   let touchStartX = 0;
   let touchEndX = 0;
 
   lightbox.addEventListener('touchstart', (e) => {
+
     touchStartX = e.changedTouches[0].screenX;
+
   }, { passive: true });
 
   lightbox.addEventListener('touchend', (e) => {
+
     touchEndX = e.changedTouches[0].screenX;
+
     handleSwipe();
+
   }, { passive: true });
 
   function handleSwipe() {
+
     const swipeThreshold = 50;
+
     const diff = touchStartX - touchEndX;
 
     if (Math.abs(diff) > swipeThreshold) {
+
       if (diff > 0) {
         showNextImage();
       } else {
@@ -186,5 +252,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  // Initial Render
   renderGallery();
+
 });
